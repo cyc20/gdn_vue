@@ -27,85 +27,108 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
-// 核心变量
+// ========== 全局常量（仅保留你指定的项） ==========
+// 颜色常量（放在一起）
+const SCENE_BACKGROUND = 0xf0f8ff // 场景背景色
+const GRASS_COLOR = 0xbdd8b8     // 草地颜色
+
+// 核心位置/缩放常量
+const CAMERA_POSITION = { x: 6, y: 3, z: 8 } // 相机位置
+const MODEL_SCALE = 0.3                     // 模型缩放（单值常量）
+const MODEL_POSITION = { x: 1, y: 0, z: 15 } // 模型位置（组合常量）
+
+// 旋转参数常量
+const ROTATE_SPEED = 0.001
+const ROTATE_IDLE_DELAY = 10000
+const ROTATE_INITIAL_ANGLE = 0
+
+// ========== 核心变量 ==========
 let scene, camera, renderer, controls
-// 时间更新定时器
 let clockTimer = null
-let angle = 0 // 相机旋转角度（初始为0）
-let isRotating = true // 旋转开关
-let idleTimer = null // 闲置计时器
-const IDLE_DELAY = 10000 // 10秒闲置触发旋转
+let angle = ROTATE_INITIAL_ANGLE
+let isRotating = true // 默认开启旋转
+let idleTimer = null
+let containerEl = null
+let resetIdleTimer = null
+
 // 初始化Three.js
 const initThree = () => {
-  const container = document.getElementById('three-container')
+  containerEl = document.getElementById('three-container')
 
-  // 1. 创建场景
+  // 1. 创建场景（使用全局背景色）
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0xf0f8ff) // 浅蓝背景
+  scene.background = new THREE.Color(SCENE_BACKGROUND)
 
-  // 2. 创建相机（透视相机，适配大屏）
+  // 2. 创建相机（使用全局相机位置）
   camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
     10000
   )
-  camera.position.set(6,3, 8);   //相机位置xyz
+  camera.position.set(CAMERA_POSITION.x, CAMERA_POSITION.y, CAMERA_POSITION.z)
 
-  // 3. 创建渲染器（抗锯齿）
+  // 3. 创建渲染器
   renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(window.innerWidth, window.innerHeight)
-  container.appendChild(renderer.domElement)
+  containerEl.appendChild(renderer.domElement)
 
-  // 4. 鼠标交互控制器（旋转/缩放/平移）
+  // 4. 控制器
   controls = new OrbitControls(camera, renderer.domElement)
-  controls.enableDamping = true // 阻尼效果，更顺滑
+  controls.enableDamping = true
   controls.dampingFactor = 0.05
-  controls.target = new THREE.Vector3(0, 0, 0); //改变初始观察点
+  controls.target = new THREE.Vector3(0, 0, 0)
 
-
-
-
-  // 5. 基础光源（保证模型可见）
+  // 5. 光源
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
   scene.add(ambientLight)
 
-// ========== 新增：创建草地平面 ==========
-const grassGeometry = new THREE.PlaneGeometry(10000, 10000) // 平面大小（根据模型尺寸调整）
-const grassMaterial = new THREE.MeshLambertMaterial({
-  color: 0xbdd8b8, // 草绿色
-  side: THREE.DoubleSide // 双面可见
-})
-const grassPlane = new THREE.Mesh(grassGeometry, grassMaterial)
-grassPlane.rotation.x = -Math.PI / 2 // 旋转成水平（默认是垂直的）
-grassPlane.position.y = 0 // 平面高度（设为模型底部高度，防止穿模）
-scene.add(grassPlane)
-// ========== 结束 ==========
+  // 草地（尺寸/位置硬编码，仅颜色用全局常量）
+  const grassGeometry = new THREE.PlaneGeometry(10000, 10000)
+  const grassMaterial = new THREE.MeshLambertMaterial({
+    color: GRASS_COLOR,
+    side: THREE.DoubleSide
+  })
+  const grassPlane = new THREE.Mesh(grassGeometry, grassMaterial)
+  grassPlane.rotation.x = -Math.PI / 2
+  grassPlane.position.y = 0
+  scene.add(grassPlane)
 
-  // 6. 加载glb模型（核心：单文件，无依赖）
+  // 加载模型（使用全局缩放/位置，旋转Y轴硬编码）
   const loader = new GLTFLoader()
   loader.load(
-    '/models/garden.glb', // glb文件路径
+    '/models/garden.glb',
     (gltf) => {
       const model = gltf.scene
-      model.scale.set(0.3, 0.3, 0.3) // 适配模型原始缩放
-      model.position.set(1, 0, 15)    // 模型居中
-      model.rotation.y = Math.PI / 2; //模型改变朝向
+      model.scale.set(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE) // 全局缩放常量
+      model.position.set(MODEL_POSITION.x, MODEL_POSITION.y, MODEL_POSITION.z) // 全局位置常量
+      model.rotation.y = Math.PI / 2; // 旋转Y轴硬编码（按你要求移除全局配置）
       scene.add(model)
       console.log('glb模型加载成功！')
     },
-    (xhr) => {
-      // console.log(`加载进度：${Math.round((xhr.loaded / xhr.total) * 100)}%`)
-    },
+    (xhr) => {},
     (error) => {
       console.error('模型加载失败：', error)
       alert('glb模型加载失败，请检查文件路径！')
     }
   )
 
-  // 7. 窗口自适应
+  // ========== 鼠标交互逻辑 ==========
+  resetIdleTimer = () => {
+    isRotating = false
+    clearTimeout(idleTimer)
+    idleTimer = setTimeout(() => {
+      isRotating = true
+      // 如需恢复初始点位，取消注释：
+      // angle = ROTATE_INITIAL_ANGLE
+    }, ROTATE_IDLE_DELAY)
+  }
+
+  containerEl.addEventListener('mousedown', resetIdleTimer)
+
+  // 窗口自适应
   window.addEventListener('resize', onWindowResize)
-  // 8. 渲染循环
+  // 渲染循环
   animate()
 }
 
@@ -113,76 +136,64 @@ scene.add(grassPlane)
 const animate = () => {
   requestAnimationFrame(animate)
 
-  // ========== 新增：相机自动旋转逻辑 ==========
-  angle -= 0.001 // 旋转速度（值越小越慢，可调整）
-  // 保持相机到模型的距离不变（半径=√(6²+8²)=10），只改变水平角度
-  const radius = Math.sqrt(6*6 + 8*8) // 相机到模型的水平距离（固定10）
-  camera.position.x = Math.cos(angle) * radius // 动态X坐标
-  camera.position.z = Math.sin(angle) * radius // 动态Z坐标
-  camera.position.y = 3 // 固定高度（保持最佳观赏高度）
-  // 始终看向模型中心(0,0,0)
-  camera.lookAt(0, 0, 0)
-  // ========== 结束 ==========
+  if (isRotating) {
+    angle -= ROTATE_SPEED
+    const radius = Math.sqrt(CAMERA_POSITION.x * CAMERA_POSITION.x + CAMERA_POSITION.z * CAMERA_POSITION.z)
+    camera.position.x = Math.cos(angle) * radius
+    camera.position.z = Math.sin(angle) * radius
+    camera.position.y = CAMERA_POSITION.y
+    camera.lookAt(0, 0, 0)
+  }
 
-  controls.update() // 更新控制器
-
-  renderer.render(scene, camera) // 渲染场景
+  controls.update()
+  renderer.render(scene, camera)
 }
 
-// 窗口大小自适应
+// 窗口自适应
 const onWindowResize = () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
-// 初始化实时时钟（拆分时间/星期/日期）
+// 时钟逻辑
 const initClock = () => {
-  // 星期映射表
   const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-  
-  // 格式化时间函数
   const updateTime = () => {
     const now = new Date()
-    // 1. 24时制时间（HH:MM:SS）
     const hour = String(now.getHours()).padStart(2, '0')
     const minute = String(now.getMinutes()).padStart(2, '0')
     const second = String(now.getSeconds()).padStart(2, '0')
     const hourText = `${hour}:${minute}:${second}`
-
-    // 2. 星期几
     const weekText = weekMap[now.getDay()]
-
-    // 3. 日期（YYYY-MM-DD）
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const day = String(now.getDate()).padStart(2, '0')
     const dateText = `${year}-${month}-${day}`
 
-    // 更新DOM
     document.getElementById('time-hour').textContent = hourText
     document.getElementById('time-week').textContent = weekText
     document.getElementById('time-date').textContent = dateText
   }
-
-  // 立即更新一次
   updateTime()
-  // 每秒更新
   clockTimer = setInterval(updateTime, 1000)
 }
 
-// 组件挂载时初始化
+// 挂载/卸载
 onMounted(() => {
   initThree()
   initClock()
 })
 
-// 组件卸载时销毁资源
 onUnmounted(() => {
   window.removeEventListener('resize', onWindowResize)
+  clearTimeout(idleTimer)
+  if (clockTimer) clearInterval(clockTimer)
+  if (containerEl && resetIdleTimer) {
+    containerEl.removeEventListener('mousedown', resetIdleTimer)
+  }
   renderer.dispose()
   scene.clear()
-  if (clockTimer) clearInterval(clockTimer)
 })
 </script>
 
