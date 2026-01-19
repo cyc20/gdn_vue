@@ -2,18 +2,17 @@
   <!-- 3D场景容器 -->
   <div id="three-container" class="fullscreen-container"></div>
   
-  <!-- 透明标题+时间浮层 -->
-  <div class="title-overlay">
-    <!-- 左侧标题 -->
-    <div class="page-title">浒墅关数字孪生平台</div>
-
-    <!-- 右上角时间区域 -->
-    <div class="time-wrapper">
-      <div class="time-hour" id="time-hour"></div>
-      <div class="time-divider"></div>
-      <div class="time-info">
-        <div class="time-week" id="time-week"></div>
-        <div class="time-date" id="time-date"></div>
+  <!-- 新的标题区域 -->
+  <div class="header">
+    <div class="header-content">
+      <div class="page-title">浒墅关数字孪生平台</div>
+      <div class="time-wrapper">
+        <div class="time-hour" id="time-hour"></div>
+        <div class="time-divider"></div>
+        <div class="time-info">
+          <div class="time-week" id="time-week"></div>
+          <div class="time-date" id="time-date"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -60,19 +59,30 @@
   z-index: 1; /* 低于浮层 */
 }
 
-/* 透明标题浮层 */
-.title-overlay {
+/* 新的标题区域样式 */
+.header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  padding: 12px 20px 30px;
-  box-sizing: border-box;
+  height: 12vh;
+  background-image: url(./assets/img/header.png);
+  background-repeat: no-repeat;
+  background-position: center;
   z-index: 10; /* 高于3D场景 */
   pointer-events: none; /* 不拦截3D交互 */
-  background: linear-gradient(to bottom, rgba(18, 123, 214, 0.5), transparent);
   display: flex;
   align-items: center;
+}
+
+
+.header-content {
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 左侧标题样式 */
@@ -81,7 +91,7 @@
   font-weight: bold;
   color: #ffffff;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
-  margin-right: auto; /* 标题靠左，时间区域靠右 */
+  margin-right: auto;
 }
 
 /* 右上角时间容器（核心：垂直居中对齐） */
@@ -182,7 +192,7 @@
 /* 左右内容面板通用样式 */
 .content-panel {
   position: fixed;
-  top: 100px; /* 避开顶部标题栏 */
+  top: 120px; /* 修改：避开新标题区域高度 */
   bottom: 70px; /* 避开底部导航栏 */
   width: 280px; /* 面板宽度 */
   background: rgba(18, 123, 214, 0.5);
@@ -243,7 +253,7 @@
   /* 移动端适配 */
   .content-panel {
     width: 180px;
-    top: 80px;
+    top: 100px; /* 修改：移动端也避开新标题区域 */
     bottom: 60px;
     padding: 10px;
   }
@@ -389,6 +399,9 @@ const initThree = () => {
   controls.dampingFactor = 0.05
   // 设置控制器的目标点
   controls.target.set(CAMERA_TARGET.x, CAMERA_TARGET.y, CAMERA_TARGET.z)
+  
+  // 启用触摸控制
+  controls.enableTouch = true
 
   // 5. 光源
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
@@ -439,13 +452,15 @@ const initThree = () => {
     clearTimeout(idleTimer)
     idleTimer = setTimeout(() => {
       isRotating = true
-      
+    
       // 启动视角过渡动画
       startCameraTransition()
     }, ROTATE_IDLE_DELAY)
   }
 
+  // 为移动端添加触摸事件监听
   containerEl.addEventListener('mousedown', resetIdleTimer)
+  containerEl.addEventListener('touchstart', resetIdleTimer)
 
   // 窗口自适应
   window.addEventListener('resize', onWindowResize)
@@ -559,7 +574,9 @@ onUnmounted(() => {
   clearTimeout(idleTimer)
   if (clockTimer) clearInterval(clockTimer)
   if (containerEl && resetIdleTimer) {
+    // 移除触摸和鼠标事件监听
     containerEl.removeEventListener('mousedown', resetIdleTimer)
+    containerEl.removeEventListener('touchstart', resetIdleTimer)
   }
   renderer.dispose()
   scene.clear()
