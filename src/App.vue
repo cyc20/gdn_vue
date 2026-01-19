@@ -2,17 +2,21 @@
   <!-- 3D场景容器 -->
   <div id="three-container" class="fullscreen-container"></div>
   
-  <!-- 新的标题区域 -->
+  <!-- header区域 -->
   <div class="header">
-      <div class="title">苏州市浒墅关数字孪生平台</div>
+      <div class="title">浒墅关先进制造区 数字孪生系统</div>
+      
       <div class="time">
-        <div class="time-hour" id="time-hour"></div>
-        <div class="time-divider"></div>
-        <div class="time-info">
-          <div class="time-week" id="time-week"></div>
-          <div class="time-date" id="time-date"></div>
+        <div id="time-hour" style="font-size: 3vh;"></div>
+        <div style="width: 2px;height: 3vh;background-color: rgba(255, 255, 255, 0.8);border-radius: 1px;"></div>
+        <div style="font-size: 1.5vh;line-height: 1.2;text-align: left;">
+
+          <div id="time-week"></div>
+          <div id="time-date"></div>
+
         </div>
       </div>
+
   </div>
 
   <!-- 左侧内容区域 -->
@@ -56,7 +60,6 @@
   overflow: hidden;
   z-index: 1; /* 低于浮层 */
 }
-/* 新的标题区域样式 */
 .header {
   position: fixed;
   top: 0;
@@ -68,65 +71,34 @@
   background-position: center;
   z-index: 10; /* 高于3D场景 */
   color: rgba(18, 123, 214, 1);
-  pointer-events: none; /* 不拦截3D交互 */
+  /*pointer-events: none; /* 不拦截3D交互 */
   display: flex;
   align-items: flex-start;/* 垂直居中 */
 }
 /* 标题 */
-.title {
-  font-size: 32px;
+.header .title {
+  font-size: 3.6vh;
   font-weight: bold;
   color: transparent;
   margin: 0 auto;
-  padding-top: 5px;
+  letter-spacing: 2px;
   background: linear-gradient(to bottom,#ffffff,hsl(209, 100%, 50%));
   -webkit-background-clip: text;
 }
 /* 时间 */
-.time {
+.header .time {
   position: absolute;
   display: flex;
   top: 0;
   right: 0;
   align-items: center;
   gap: 10px; /* 元素间间距 */
-  margin: 0 20px 0 0;
+  margin: 0.8vh 2vh 0 0;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
-/* 左侧24时制时间 */
-.time-hour {
-  font-size: 26px; /* 字体高度匹配右侧两个元素总高度 */
-  line-height: 48px; /* 行高等于容器高度，垂直居中 */
-}
 
-/* 分隔竖线 */
-.time-divider {
-  width: 2px;
-  height: 26px; /* 竖线高度等于时间容器高度 */
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 1px;
-}
 
-/* 右侧星期+日期容器 */
-.time-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* 星期样式 */
-.time-week {
-  font-size: 12px;
-  text-align: left;
-  line-height: 1.2;
-}
-
-/* 日期样式 */
-.time-date {
-  font-size: 12px;
-  line-height: 1.2;
-}
 
 /* 底部导航栏 */
 .bottom-nav {
@@ -216,41 +188,8 @@
 
 /* 响应式适配 */
 @media (max-width: 768px) {
-  .title {
-    font-size: 24px;
-  }
-  .time-hour {
-    font-size: 20px;
-  }
-  .time-week {
-    font-size: 14px;
-  }
-  .time-date {
-    font-size: 12px;
-  }
-  .time {
-    height: 36px;
-  }
-  .time-divider {
-    height: 36px;
-  }
-  
-  /* 移动端适配 */
-  .content-panel {
-    width: 180px;
-    top: 100px; /* 修改：移动端也避开新标题区域 */
-    bottom: 60px;
-    padding: 10px;
-  }
-  .left-panel {
-    left: 10px;
-  }
-  .right-panel {
-    right: 10px;
-  }
-  .nav-item {
-    font-size: 14px;
-  }
+
+
 }
 </style>
 
@@ -393,7 +332,7 @@ const initThree = () => {
   scene.add(ambientLight)
 
   // 草地（尺寸/位置硬编码，仅颜色用全局常量）
-  const grassGeometry = new THREE.PlaneGeometry(10000, 10000)
+  const grassGeometry = new THREE.PlaneGeometry(1000, 1000)
   const grassMaterial = new THREE.MeshLambertMaterial({
     color: GRASS_COLOR,
     side: THREE.DoubleSide
@@ -420,14 +359,10 @@ const initThree = () => {
       scene.add(model)
       console.log('glb模型加载成功！')
     },
-    (xhr) => {
-      // 加载进度回调
-      const progress = (xhr.loaded / xhr.total) * 100;
-      console.log(`模型加载进度: ${Math.round(progress)}%`);
-    },
+    (xhr) => {},
     (error) => {
       console.error('模型加载失败：', error)
-      alert('glb模型加载失败，请检查文件路径！可能原因：\n1. 文件不存在\n2. 网络问题\n3. 模型格式错误')
+      alert('glb模型加载失败！可能原因：\n1. 文件不存在\n2. 网络\n3. 格式错误')
     }
   )
 
@@ -446,6 +381,7 @@ const initThree = () => {
   // 为移动端添加触摸事件监听
   containerEl.addEventListener('mousedown', resetIdleTimer)
   containerEl.addEventListener('touchstart', resetIdleTimer)
+  containerEl.addEventListener('wheel', resetIdleTimer)
 
   // 窗口自适应
   window.addEventListener('resize', onWindowResize)
@@ -562,6 +498,7 @@ onUnmounted(() => {
     // 移除触摸和鼠标事件监听
     containerEl.removeEventListener('mousedown', resetIdleTimer)
     containerEl.removeEventListener('touchstart', resetIdleTimer)
+    containerEl.removeEventListener('wheel', resetIdleTimer)
   }
   renderer.dispose()
   scene.clear()
