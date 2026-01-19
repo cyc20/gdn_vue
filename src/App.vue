@@ -4,9 +4,8 @@
   
   <!-- 新的标题区域 -->
   <div class="header">
-    <div class="header-content">
-      <div class="page-title">浒墅关数字孪生平台</div>
-      <div class="time-wrapper">
+      <div class="title">苏州市浒墅关数字孪生平台</div>
+      <div class="time">
         <div class="time-hour" id="time-hour"></div>
         <div class="time-divider"></div>
         <div class="time-info">
@@ -14,7 +13,6 @@
           <div class="time-date" id="time-date"></div>
         </div>
       </div>
-    </div>
   </div>
 
   <!-- 左侧内容区域 -->
@@ -58,62 +56,54 @@
   overflow: hidden;
   z-index: 1; /* 低于浮层 */
 }
-
 /* 新的标题区域样式 */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  height: 12vh;
+  height: 11vh;
   background-image: url(./assets/img/header.png);
-  background-repeat: no-repeat;
+  background-repeat: repeat-x;
   background-position: center;
   z-index: 10; /* 高于3D场景 */
+  color: rgba(18, 123, 214, 1);
   pointer-events: none; /* 不拦截3D交互 */
   display: flex;
-  align-items: center;
+  align-items: flex-start;/* 垂直居中 */
 }
-
-
-.header-content {
-  width: 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 左侧标题样式 */
-.page-title {
+/* 标题 */
+.title {
   font-size: 32px;
   font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
-  margin-right: auto;
+  color: transparent;
+  margin: 0 auto;
+  padding-top: 5px;
+  background: linear-gradient(to bottom,#ffffff,hsl(209, 100%, 50%));
+  -webkit-background-clip: text;
 }
-
-/* 右上角时间容器（核心：垂直居中对齐） */
-.time-wrapper {
+/* 时间 */
+.time {
+  position: absolute;
   display: flex;
+  top: 0;
+  right: 0;
   align-items: center;
   gap: 10px; /* 元素间间距 */
-  height: 48px; /* 总高度，匹配右侧两个元素的总高度 */
+  margin: 0 20px 0 0;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 /* 左侧24时制时间 */
 .time-hour {
-  font-size: 36px; /* 字体高度匹配右侧两个元素总高度 */
-  color: #ffffff;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  font-size: 26px; /* 字体高度匹配右侧两个元素总高度 */
   line-height: 48px; /* 行高等于容器高度，垂直居中 */
 }
 
 /* 分隔竖线 */
 .time-divider {
   width: 2px;
-  height: 48px; /* 竖线高度等于时间容器高度 */
+  height: 26px; /* 竖线高度等于时间容器高度 */
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 1px;
 }
@@ -123,23 +113,18 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 40px; /* 总高度与左侧时间行高一致 */
 }
 
 /* 星期样式 */
 .time-week {
-  font-size: 18px;
-  color: #ffffff;
+  font-size: 12px;
   text-align: left;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
   line-height: 1.2;
 }
 
 /* 日期样式 */
 .time-date {
-  font-size: 16px;
-  color: #ffffff;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  font-size: 12px;
   line-height: 1.2;
 }
 
@@ -231,7 +216,7 @@
 
 /* 响应式适配 */
 @media (max-width: 768px) {
-  .page-title {
+  .title {
     font-size: 24px;
   }
   .time-hour {
@@ -243,7 +228,7 @@
   .time-date {
     font-size: 12px;
   }
-  .time-wrapper {
+  .time {
     height: 36px;
   }
   .time-divider {
@@ -336,7 +321,7 @@ const rightPanelTransform = computed(() => {
 
 // ========== 全局常量（仅保留你指定的项） ==========
 // 颜色常量（放在一起）
-const SCENE_BACKGROUND = 0xf0f8ff // 场景背景色
+const SCENE_BACKGROUND = 0x1a1a2e // 场景背景色
 const GRASS_COLOR = 0xbdd8b8     // 草地颜色
 
 // 核心位置/缩放常量
