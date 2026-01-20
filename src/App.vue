@@ -7,16 +7,16 @@
       <h1>浒墅关先进制造区 数字孪生系统</h1>
       
       <div class="info" >
-        <p>苏州·虎丘区</p>
-        <p>苏园雅韵·智园新序</p>
+        <p class="ZYXX" style="font-size: 3vh">「智园新序」</p>
+        <p style="font-size: 1.5vh;">苏州 · 虎丘区</p>
       </div>
 
       <div class="time">
-        <p id="time-hour" style="all:unset;font-size: 3vh;"></p>
+        <p id="time-hour" style="font-size: 3vh;"></p>
         <span style="width: 1px;height: 3vh;background: #FFFC;"/>
         <div style="font-size: 1.5vh;line-height: 1.2;text-align: left;">
-          <p id="time-week" style="all:unset;display: block;"></p>
-          <p id="time-date" style="all:unset;display: block;"></p>
+          <p id="time-week"></p>
+          <p id="time-date"></p>
         </div>
       </div>
 
@@ -51,6 +51,13 @@
 </template>
 
 <style scoped>
+* {
+  all:unset;
+  box-sizing: border-box;
+}
+p {
+  display: block;
+}
 /* ////////////////////////////////////////////// 全屏3D容器 ////////////////////////////////////////////// */
 .fullscreen-container {
   position: fixed;
@@ -58,10 +65,16 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  margin: 0;
-  padding: 0;
   overflow: hidden;
   z-index: 1; /* 低于浮层 */
+}
+.fullscreen-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 70%, rgba(0,0,0,0.2) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 /* ////////////////////////////////////////////// 顶部标题 ////////////////////////////////////////////// */
 .header {
@@ -70,17 +83,17 @@
   left: 0;
   width: 100vw;
   height: 11vh;
+  padding-bottom: 5vh;
   background: url(./assets/img/header.png) center repeat-x;
   mask-image: linear-gradient(to bottom,black 65%,transparent 100%);
   z-index: 10; /* 高于3D场景 */
-  color: rgba(18, 123, 214, 1);
+  color: #127BD6;
   /*pointer-events: none; /* 不拦截3D交互 */
   display: flex;
   align-items: flex-start;/* 垂直居中 */
 }
 /* 标题 */
 .header h1 {
-  all: unset;
   font-size: 3.6vh;
   font-weight: bold;
   color: transparent;
@@ -94,9 +107,21 @@
 /* 副标题 */
 .header .info { 
   position: absolute;
-  display: flex;
   top: 0;
   left: 0;
+  display: flex;
+  align-items: flex-end;
+  margin: 0.8vh 0 0 2vh;
+  gap: 6px;
+  font-weight: bold;
+}
+
+.header .info .ZYXX { 
+  font-family: "宋体";
+  color: transparent;
+  background: linear-gradient(to bottom,#ffffff,hsl(209, 100%, 50%));
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 
 /* 时间 */
@@ -108,7 +133,6 @@
   align-items: center;
   gap: 6px; /* 元素间间距 */
   margin: 0.8vh 2vh 0 0;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 
@@ -163,9 +187,9 @@
 /* ////////////////////////////////////////////// 左右面板 ////////////////////////////////////////////// */
 .content-panel {
   position: fixed;
-  top: 120px; /* 修改：避开新标题区域高度 */
+  top: 7vh; /* 修改：避开新标题区域高度 */
   bottom: 70px; /* 避开底部导航栏 */
-  width: 280px; /* 面板宽度 */
+  width: 20vw; /* 面板宽度 */
   background: rgba(18, 123, 214, 0.5);
   border-radius: 8px 0 0 8px; /* 左侧面板：右下和右上无圆角 */
   padding: 20px;
