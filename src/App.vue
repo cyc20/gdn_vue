@@ -8,12 +8,12 @@
       
       <div class="info" >
         <p class="ZYXX" style="font-size: 3vh">「智园新序」</p>
-        <p style="font-size: 1.5vh;">苏州 · 虎丘区</p>
+        <p style="font-size: 1.5vh;margin-bottom: 0.6vh;">苏州 · 虎丘区</p>
       </div>
 
       <div class="time">
         <p id="time-hour" style="font-size: 3vh;"></p>
-        <span style="width: 1px;height: 3vh;background: #FFFC;"/>
+        <span style="width: 1px;height: 3.2vh;background: #FFFC;margin: 0 1vh;"/>
         <div style="font-size: 1.5vh;line-height: 1.2;text-align: left;">
           <p id="time-week"></p>
           <p id="time-date"></p>
@@ -37,7 +37,7 @@
   </div>
 
   <!-- 底部导航栏 -->
-  <div class="bottom-nav">
+  <!-- <div class="bottom-nav">
     <div 
       class="nav-item" 
       v-for="(item, index) in navItems" 
@@ -47,6 +47,16 @@
     >
       {{ item.name }}
     </div>
+  </div> -->
+
+
+  <div class="footer">
+    <ul>
+      <li style="background: url(./assets/img/btn1.png);"></li>
+      <li style="background: url(./assets/img/btn2.png);"></li>
+      <li style="background: url(./assets/img/btn3.png);"></li>
+      <li style="background: url(./assets/img/btn4.png);"></li>
+    </ul>
   </div>
 </template>
 
@@ -57,6 +67,16 @@
 }
 p {
   display: block;
+}
+.footer{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 10vh;
+  background: url(./assets/img/footer.png) bottom no-repeat;
+  background-size: 80%;
+  z-index: 10; /* 高于3D场景 */
 }
 /* ////////////////////////////////////////////// 全屏3D容器 ////////////////////////////////////////////// */
 .fullscreen-container {
@@ -112,12 +132,11 @@ p {
   display: flex;
   align-items: flex-end;
   margin: 0.8vh 0 0 2vh;
-  gap: 6px;
   font-weight: bold;
 }
 
 .header .info .ZYXX { 
-  font-family: "宋体";
+  font-family: "宋体", SimSun, "Songti SC", "Noto Serif CJK SC", "WenQuanYi Song", Arial, serif;
   color: transparent;
   background: linear-gradient(to bottom,#ffffff,hsl(209, 100%, 50%));
   background-clip: text;
@@ -131,7 +150,6 @@ p {
   top: 0;
   right: 0;
   align-items: center;
-  gap: 6px; /* 元素间间距 */
   margin: 0.8vh 2vh 0 0;
 }
 
@@ -266,7 +284,7 @@ const navItems = ref([
 const activeNav = ref(0)
 
 // 面板显示状态
-const showPanels = ref(true)
+const showPanels = ref(false)
 
 // 切换导航项方法
 const switchNav = (index) => {
