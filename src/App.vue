@@ -8,12 +8,10 @@
       
       <div class="time">
         <div id="time-hour" style="font-size: 3vh;"></div>
-        <div style="width: 2px;height: 3vh;background-color: rgba(255, 255, 255, 0.8);border-radius: 1px;"></div>
+        <div style="width: 1px;height: 3vh;background-color: #FFFFFFCC;"></div>
         <div style="font-size: 1.5vh;line-height: 1.2;text-align: left;">
-
           <div id="time-week"></div>
           <div id="time-date"></div>
-
         </div>
       </div>
 
@@ -83,6 +81,7 @@
   margin: 0 auto;
   letter-spacing: 2px;
   background: linear-gradient(to bottom,#ffffff,hsl(209, 100%, 50%));
+  background-clip: text;
   -webkit-background-clip: text;
 }
 /* 时间 */
@@ -92,7 +91,7 @@
   top: 0;
   right: 0;
   align-items: center;
-  gap: 10px; /* 元素间间距 */
+  gap: 6px; /* 元素间间距 */
   margin: 0.8vh 2vh 0 0;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
@@ -258,34 +257,45 @@ const rightPanelTransform = computed(() => {
   return showPanels.value ? '0' : '100%'
 })
 
+
+
+
+
+
+
+
+
 // ========== 全局常量（仅保留你指定的项） ==========
 // 颜色常量（放在一起）
-const SCENE_BACKGROUND = 0x1a1a2e // 场景背景色
-const GRASS_COLOR = 0xbdd8b8     // 草地颜色
+const SKY_COLOR = 0x1a1a2e // 场景背景色
+const GROUND_COLOR = 0xbdd8b8     // 草地颜色
+const GROUND_HEIGHT = -0.35
 
 // 核心位置/缩放常量
-const CAMERA_POSITION = { x: 6, y: 3, z: 8 } // 相机位置
+const MODEL_SCALE = 0.3 // 添加模型缩放常量
 const MODEL_POSITION = { x: 1, y: 0, z: 15 } // 模型位置（组合常量）
 const CAMERA_TARGET = { x: 0, y: 0, z: 0 } // 添加相机目标点常量
-const MODEL_SCALE = 0.3 // 添加模型缩放常量
+const CAMERA_POSITION = { x: 6, y: 3, z: 8 } // 相机位置
 
 // 旋转参数常量
 const ROTATE_SPEED = 0.001
-const ROTATE_IDLE_DELAY = 3000
+const IDLE_DELAY = 3000
 const ROTATE_INITIAL_ANGLE = 0
 
-// 视角过渡相关常量
-const TRANSITION_DURATION = 2000 // 过渡动画持续时间（毫秒）
-const TRANSITION_EASING = t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1 // 缓动函数
+
+
+
+
+
+
+
+
 
 // ========== 核心变量 ==========
 let scene, camera, renderer, controls
 let clockTimer = null
 let angle = ROTATE_INITIAL_ANGLE
-let isRotating = true // 默认开启旋转
-let idleTimer = null
 let containerEl = null
-let resetIdleTimer = null
 
 // 视角过渡相关变量
 let isTransitioning = false
@@ -295,13 +305,18 @@ let endPosition = null
 let startTarget = null
 let endTarget = null
 
+// 交互变量
+let isRotating = true // 默认开启旋转
+let isInteracting = false
+let idleTimer = null
+
 // 初始化Three.js
 const initThree = () => {
   containerEl = document.getElementById('three-container')
 
   // 1. 创建场景（使用全局背景色）
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(SCENE_BACKGROUND)
+  scene.background = new THREE.Color(SKY_COLOR)
 
   // 2. 创建相机（使用全局相机位置）
   camera = new THREE.PerspectiveCamera(
@@ -324,6 +339,17 @@ const initThree = () => {
   // 设置控制器的目标点
   controls.target.set(CAMERA_TARGET.x, CAMERA_TARGET.y, CAMERA_TARGET.z)
   
+  // 设置视角限制，禁止视角的下半圆角度
+  controls.minPolarAngle = 0 // 最小极角，0为正上方
+  controls.maxPolarAngle = Math.PI / 2 // 最大极角，Math.PI/2为水平方向
+
+  // 限制相机目标点Y坐标不低于0
+  controls.addEventListener('change', () => {
+    if (controls.target.y < 0) {
+      controls.target.y = 0
+    }
+  })
+
   // 启用触摸控制
   controls.enableTouch = true
 
@@ -334,12 +360,12 @@ const initThree = () => {
   // 草地（尺寸/位置硬编码，仅颜色用全局常量）
   const grassGeometry = new THREE.PlaneGeometry(1000, 1000)
   const grassMaterial = new THREE.MeshLambertMaterial({
-    color: GRASS_COLOR,
+    color: GROUND_COLOR,
     side: THREE.DoubleSide
   })
   const grassPlane = new THREE.Mesh(grassGeometry, grassMaterial)
   grassPlane.rotation.x = -Math.PI / 2
-  grassPlane.position.y = 0
+  grassPlane.position.y = GROUND_HEIGHT
   scene.add(grassPlane)
 
   // 加载模型（使用全局缩放/位置，旋转Y轴硬编码）
@@ -367,7 +393,9 @@ const initThree = () => {
   )
 
   // ========== 鼠标交互逻辑 ==========
-  resetIdleTimer = () => {
+
+  
+  const resetIdleTimer = () => {
     isRotating = false
     clearTimeout(idleTimer)
     idleTimer = setTimeout(() => {
@@ -375,13 +403,30 @@ const initThree = () => {
     
       // 启动视角过渡动画
       startCameraTransition()
-    }, ROTATE_IDLE_DELAY)
+    }, IDLE_DELAY)
   }
 
-  // 为移动端添加触摸事件监听
-  containerEl.addEventListener('mousedown', resetIdleTimer)
-  containerEl.addEventListener('touchstart', resetIdleTimer)
+  // 添加交互开始处理函数
+  const handleInteractionStart = () => {
+    isInteracting = true
+    resetIdleTimer()
+  }
+
+  // 添加交互结束处理函数
+  const handleInteractionEnd = () => {
+    isInteracting = false
+    resetIdleTimer()
+  }
+
+  
+  // 添加鼠标移动和释放事件监听
+  containerEl.addEventListener('mousedown', handleInteractionStart)
+  containerEl.addEventListener('mouseup', handleInteractionEnd)
   containerEl.addEventListener('wheel', resetIdleTimer)
+  // 为移动端添加触摸事件监听
+  containerEl.addEventListener('touchstart', handleInteractionStart)
+  containerEl.addEventListener('touchmove', handleInteractionStart)
+  containerEl.addEventListener('touchend', handleInteractionEnd)
 
   // 窗口自适应
   window.addEventListener('resize', onWindowResize)
@@ -416,9 +461,9 @@ const updateCameraTransition = () => {
   if (!isTransitioning) return
   
   const elapsed = Date.now() - transitionStartTime
-  const progress = Math.min(elapsed / TRANSITION_DURATION, 1)
-  const easedProgress = TRANSITION_EASING(progress)
-  
+  const progress = Math.min(elapsed / 2000, 1)
+  // 缓动函数的计算逻辑
+  const easedProgress = progress < 0.5 ? 4 * progress * progress * progress : (progress - 1) * (2 * progress - 2) * (2 * progress - 2) + 1
   // 插值计算当前位置和目标
   camera.position.lerpVectors(startPosition, endPosition, easedProgress)
   controls.target.lerpVectors(startTarget, endTarget, easedProgress)
@@ -433,7 +478,7 @@ const updateCameraTransition = () => {
 const animate = () => {
   requestAnimationFrame(animate)
 
-  if (isRotating && !isTransitioning) {
+  if (isRotating && !isTransitioning && !isInteracting) {
     angle -= ROTATE_SPEED
     const radius = Math.sqrt(CAMERA_POSITION.x * CAMERA_POSITION.x + CAMERA_POSITION.z * CAMERA_POSITION.z)
     camera.position.x = Math.cos(angle) * radius
@@ -494,11 +539,16 @@ onUnmounted(() => {
   window.removeEventListener('resize', onWindowResize)
   clearTimeout(idleTimer)
   if (clockTimer) clearInterval(clockTimer)
-  if (containerEl && resetIdleTimer) {
-    // 移除触摸和鼠标事件监听
-    containerEl.removeEventListener('mousedown', resetIdleTimer)
-    containerEl.removeEventListener('touchstart', resetIdleTimer)
+  if (containerEl) {
+    // 移除鼠标事件监听
+    containerEl.removeEventListener('mousedown', handleInteractionStart)
+    containerEl.removeEventListener('mousemove', handleInteractionStart)
+    containerEl.removeEventListener('mouseup', handleInteractionEnd)
     containerEl.removeEventListener('wheel', resetIdleTimer)
+    // 移除触摸事件监听
+    containerEl.removeEventListener('touchstart', handleInteractionStart)
+    containerEl.removeEventListener('touchmove', handleInteractionStart)
+    containerEl.removeEventListener('touchend', handleInteractionEnd)
   }
   renderer.dispose()
   scene.clear()
