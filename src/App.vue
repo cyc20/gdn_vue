@@ -4,14 +4,19 @@
   
   <!-- header区域 -->
   <div class="header">
-      <div class="title">浒墅关先进制造区 数字孪生系统</div>
+      <h1>浒墅关先进制造区 数字孪生系统</h1>
       
+      <div class="info" >
+        <p>苏州·虎丘区</p>
+        <p>苏园雅韵·智园新序</p>
+      </div>
+
       <div class="time">
-        <div id="time-hour" style="font-size: 3vh;"></div>
-        <div style="width: 1px;height: 3vh;background-color: #FFFFFFCC;"></div>
+        <p id="time-hour" style="all:unset;font-size: 3vh;"></p>
+        <span style="width: 1px;height: 3vh;background: #FFFC;"/>
         <div style="font-size: 1.5vh;line-height: 1.2;text-align: left;">
-          <div id="time-week"></div>
-          <div id="time-date"></div>
+          <p id="time-week" style="all:unset;display: block;"></p>
+          <p id="time-date" style="all:unset;display: block;"></p>
         </div>
       </div>
 
@@ -46,7 +51,7 @@
 </template>
 
 <style scoped>
-/* 全屏3D容器 */
+/* ////////////////////////////////////////////// 全屏3D容器 ////////////////////////////////////////////// */
 .fullscreen-container {
   position: fixed;
   top: 0;
@@ -58,15 +63,15 @@
   overflow: hidden;
   z-index: 1; /* 低于浮层 */
 }
+/* ////////////////////////////////////////////// 顶部标题 ////////////////////////////////////////////// */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 11vh;
-  background-image: url(./assets/img/header.png);
-  background-repeat: repeat-x;
-  background-position: center;
+  background: url(./assets/img/header.png) center repeat-x;
+  mask-image: linear-gradient(to bottom,black 65%,transparent 100%);
   z-index: 10; /* 高于3D场景 */
   color: rgba(18, 123, 214, 1);
   /*pointer-events: none; /* 不拦截3D交互 */
@@ -74,7 +79,8 @@
   align-items: flex-start;/* 垂直居中 */
 }
 /* 标题 */
-.header .title {
+.header h1 {
+  all: unset;
   font-size: 3.6vh;
   font-weight: bold;
   color: transparent;
@@ -84,6 +90,15 @@
   background-clip: text;
   -webkit-background-clip: text;
 }
+
+/* 副标题 */
+.header .info { 
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+}
+
 /* 时间 */
 .header .time {
   position: absolute;
@@ -99,7 +114,7 @@
 
 
 
-/* 底部导航栏 */
+/* ////////////////////////////////////////////// 底部导航栏 ////////////////////////////////////////////// */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -145,7 +160,7 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* 左右内容面板通用样式 */
+/* ////////////////////////////////////////////// 左右面板 ////////////////////////////////////////////// */
 .content-panel {
   position: fixed;
   top: 120px; /* 修改：避开新标题区域高度 */
