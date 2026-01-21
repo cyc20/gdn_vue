@@ -22,28 +22,31 @@
 
   </div>
 
+
   <!-- 左侧内容区域 -->
-  <div class="content-panel left-panel">
-    <div class="panel-content">
+  <div class="panel left-p">
+    <div class="content">
       {{ panelContent.left }}
     </div>
   </div>
 
   <!-- 右侧内容区域 -->
-  <div class="content-panel right-panel">
-    <div class="panel-content">
+  <div class="panel right-p">
+    <div class="content">
       {{ panelContent.right }}
     </div>
   </div>
 
+
+
   <div class="footer">
     <ul>
-      <li><p>综合态势</p><img src="./assets/img/icon1.png" style="width: 100%;"><div class="mask" @click="switchNav(0)"></div></li>
-      <li><p>园测数据</p><img src="./assets/img/icon2.png" style="width: 100%;"><div class="mask" @click="switchNav(1)"></div></li>
-      <li><p>安防监控</p><img src="./assets/img/icon3.png" style="width: 100%;"><div class="mask" @click="switchNav(2)"></div></li>
-      <li><p>能源管理</p><img src="./assets/img/icon4.png" style="width: 100%;"><div class="mask" @click="switchNav(3)"></div></li>
+      <li :class="{ selected: activeNav === 0, collapsed: !showPanels }"><p>综合态势</p><img src="./assets/img/icon1.png" style="width: 100%;"><div class="mask" @click="switchNav(0)"></div></li>
+      <li :class="{ selected: activeNav === 1, collapsed: !showPanels }"><p>园测数据</p><img src="./assets/img/icon2.png" style="width: 100%;"><div class="mask" @click="switchNav(1)"></div></li>
+      <li :class="{ selected: activeNav === 2, collapsed: !showPanels }"><p>安防监控</p><img src="./assets/img/icon3.png" style="width: 100%;"><div class="mask" @click="switchNav(2)"></div></li>
+      <li :class="{ selected: activeNav === 3, collapsed: !showPanels }"><p>能源管理</p><img src="./assets/img/icon4.png" style="width: 100%;"><div class="mask" @click="switchNav(3)"></div></li>
     </ul>
-    <img src="./assets/img/footer.png" style="width: 100%;transform: scale(0.8);padding-left: 0.3vw;">
+    <img src="./assets/img/footer.png" style="display: block; width: 100%;transform: scale(0.8);padding-left: 0.3vw;">
   </div>
 </template>
 <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
@@ -54,7 +57,6 @@
 <style scoped>
 * {all:unset;box-sizing: border-box;}
 p {display: block;}
-
 
 /* ////////////////////////////////////////////// 全屏3D容器 ////////////////////////////////////////////// */
 .fullscreen-container {
@@ -70,7 +72,7 @@ p {display: block;}
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 70%, rgba(0,0,0,0.2) 100%);
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -83,7 +85,7 @@ p {display: block;}
   align-items: flex-start;/* 垂直居中 */
   width: 100vw;
   height: 11vh;
-  color: #127BD6;
+  color: #3da1ff;
   padding-bottom: 5vh;
   background: url(./assets/img/header.png) center repeat-x;
   mask-image: linear-gradient(to bottom,black 65%,transparent 100%);
@@ -133,43 +135,43 @@ p {display: block;}
 
 
 /* ////////////////////////////////////////////// 左右面板 ////////////////////////////////////////////// */
-.content-panel {
+.panel {
   position: fixed;
   top: 7vh; /* 修改：避开新标题区域高度 */
   bottom: 3vh; /* 避开底部导航栏 */
-  width: 20vw; /* 面板宽度 */
-  background: rgba(18, 123, 214, 0.5);
-  border-radius: 8px 0 0 8px; /* 左侧面板：右下和右上无圆角 */
+  width: 25vw; /* 面板宽度 */
   padding: 20px;
   box-sizing: border-box;
   z-index: 10; /* 高于3D场景 */
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   pointer-events: auto; /* 开启交互 */
   transition: transform 0.3s ease; /* 添加滑动动画 */
 }
 
 /* 左侧面板 - 居中靠左 */
-.left-panel {
+.left-p {
   left: 0; /* 修改：直接贴到左边 */
-  border-radius: 0 8px 8px 0; /* 左侧面板：左边框无圆角 */
   transform: translateX(v-bind(leftPanelTransform)); /* 动态控制左侧板位置 */
+  text-align: left;
+  margin: auto;
 }
 
 /* 右侧面板 - 居中靠右 */
-.right-panel {
+.right-p {
   right: 0; /* 修改：直接贴到右边 */
-  border-radius: 8px 0 0 8px; /* 右侧面板：右边框无圆角 */
   transform: translateX(v-bind(rightPanelTransform)); /* 动态控制右侧板位置 */
+  text-align: left;
+  margin: auto;
 }
 
 /* 面板内容样式 */
-.panel-content {
+.content {
   color: #ffffff;
   font-size: 16px;
   line-height: 1.6;
   height: 100%;
   overflow-y: auto; /* 内容超出时滚动 */
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  white-space: pre-line;
 }
 
 
@@ -202,6 +204,10 @@ p {display: block;}
   width: 6vw;
   color: #ffffff;
   font-size: 1vw;  
+  transition: transform 0.3s ease; /* 添加过渡动画 */
+}
+.footer ul li.selected:not(.collapsed) {
+  transform: translateY(-2vh); /* 选中时向上移动2vh */
 }
 .footer ul li .mask{
   position: absolute;
@@ -210,6 +216,7 @@ p {display: block;}
   width: 100%;
   height: 100%;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 </style>
@@ -293,8 +300,8 @@ const rightPanelTransform = computed(() => {
 
 // ========== 全局常量（仅保留你指定的项） ==========
 // 颜色常量（放在一起）
-const SKY_COLOR = 0x1a1a2e // 场景背景色
-const GROUND_COLOR = 0xbdd8b8     // 草地颜色
+const SKY_COLOR = 0xffffff // 场景背景色
+const GROUND_COLOR = 0xffffff     // 草地颜色
 const GROUND_HEIGHT = -0.35
 
 // 核心位置/缩放常量
