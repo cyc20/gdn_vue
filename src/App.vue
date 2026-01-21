@@ -36,26 +36,12 @@
     </div>
   </div>
 
-  <!-- 底部导航栏 -->
-  <!-- <div class="bottom-nav">
-    <div 
-      class="nav-item" 
-      v-for="(item, index) in navItems" 
-      :key="index"
-      :class="{ active: activeNav === index }"
-      @click="switchNav(index)"
-    >
-      {{ item.name }}
-    </div>
-  </div> -->
-
-
   <div class="footer">
     <ul>
-      <li style="background: url('/src/assets/img/icon1.png') no-repeat center / 200%;">综合态势</li>
-      <li style="background: url('/src/assets/img/icon2.png') no-repeat center / 200%;">园测数据</li>
-      <li style="background: url('/src/assets/img/icon3.png') no-repeat center / 200%;">监控安防</li>
-      <li style="background: url('/src/assets/img/icon4.png') no-repeat center / 200%;">能源管理</li>
+      <li><p>综合态势</p><img src="./assets/img/icon1.png" style="width: 100%;"><div class="mask" @click="switchNav(0)"></div></li>
+      <li><p>园测数据</p><img src="./assets/img/icon2.png" style="width: 100%;"><div class="mask" @click="switchNav(1)"></div></li>
+      <li><p>安防监控</p><img src="./assets/img/icon3.png" style="width: 100%;"><div class="mask" @click="switchNav(2)"></div></li>
+      <li><p>能源管理</p><img src="./assets/img/icon4.png" style="width: 100%;"><div class="mask" @click="switchNav(3)"></div></li>
     </ul>
     <img src="./assets/img/footer.png" style="width: 100%;transform: scale(0.8);padding-left: 0.3vw;">
   </div>
@@ -69,33 +55,7 @@
 * {all:unset;box-sizing: border-box;}
 p {display: block;}
 
-.footer{
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  width: 100vw;
-  height: 15vh;
-  z-index: 10; /* 高于3D场景 */
-}
 
-.footer ul{ 
-  display: flex;
-  width: fit-content;
-  margin: 0 auto;
-  gap: 3vw;
-}
-.footer ul li{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 6vw;
-  height: 10vh;
-  color: #ffffff;
-  font-size: 1vw;
-}
 /* ////////////////////////////////////////////// 全屏3D容器 ////////////////////////////////////////////// */
 .fullscreen-container {
   position: fixed;
@@ -172,59 +132,11 @@ p {display: block;}
 }
 
 
-
-
-/* ////////////////////////////////////////////// 底部导航栏 ////////////////////////////////////////////// */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100vw; /* 顶格宽度，与顶部导航栏一致 */
-  height: 60px;
-  background: rgba(18, 123, 214, 0.7);
-  display: flex;
-  justify-content: center; /* 修改：居中对齐 */
-  align-items: center;
-  z-index: 10; /* 高于3D场景 */
-  box-sizing: border-box;
-  pointer-events: auto; /* 开启点击事件 */
-  padding: 0 20px; /* 添加内边距防止内容贴边 */
-  box-sizing: border-box;
-}
-
-/* 导航项样式 */
-.nav-item {
-  flex: 0 0 auto; /* 修改：不伸缩，根据内容自适应 */
-  min-width: 80px; /* 设置最小宽度 */
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #ffffff;
-  font-size: 18px;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 0 10px; /* 添加外边距分隔导航项 */
-  padding: 0 15px; /* 添加内边距增加点击区域 */
-}
-
-/* 激活状态 */
-.nav-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  border-top: 3px solid #ffffff;
-}
-
-/* 鼠标悬停 */
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 /* ////////////////////////////////////////////// 左右面板 ////////////////////////////////////////////// */
 .content-panel {
   position: fixed;
   top: 7vh; /* 修改：避开新标题区域高度 */
-  bottom: 70px; /* 避开底部导航栏 */
+  bottom: 3vh; /* 避开底部导航栏 */
   width: 20vw; /* 面板宽度 */
   background: rgba(18, 123, 214, 0.5);
   border-radius: 8px 0 0 8px; /* 左侧面板：右下和右上无圆角 */
@@ -260,11 +172,46 @@ p {display: block;}
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
-/* 响应式适配 */
-@media (max-width: 768px) {
 
 
+
+/* ////////////////////////////////////////////// 底部导航栏 ////////////////////////////////////////////// */
+.footer{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  width: 100vw;
+  z-index: 10; /* 高于3D场景 */
 }
+
+.footer ul{ 
+  display: flex;
+  width: fit-content;
+  margin: 0 auto;
+  gap: 3vw;
+}
+.footer ul li{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 6vw;
+  color: #ffffff;
+  font-size: 1vw;  
+}
+.footer ul li .mask{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
 </style>
 <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
@@ -302,11 +249,11 @@ const navItems = ref([
   }
 ])
 
-// 当前激活的导航项索引
+// 当前激活的导航项索引(范围0-3)
 const activeNav = ref(0)
 
 // 面板显示状态
-const showPanels = ref(false)
+const showPanels = ref(true)
 
 // 切换导航项方法
 const switchNav = (index) => {
