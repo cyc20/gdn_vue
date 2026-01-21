@@ -49,18 +49,15 @@
     </div>
   </div> -->
 
-#23fffc
-#fed52f
-#2395ff
-#ae00ff
 
   <div class="footer">
     <ul>
-      <li style="color: #23fffc;text-shadow: 0 0 8px  #23fffc; background: url('/src/assets/img/btn1.png') no-repeat center / contain;">首页<br>展示</li>
-      <li style="color: #fed52f;text-shadow: 0 0 8px  #fed52f; background: url('/src/assets/img/btn2.png') no-repeat center / contain;">数据<br>监测</li>
-      <li style="color: #2395ff;text-shadow: 0 0 8px  #2395ff; background: url('/src/assets/img/btn3.png') no-repeat center / contain;">设备<br>管理</li>
-      <li style="color: #ae00ff;text-shadow: 0 0 8px  #ae00ff; background: url('/src/assets/img/btn4.png') no-repeat center / contain;">系统<br>设置</li>
+      <li style="background: url('/src/assets/img/icon1.png') no-repeat center / 200%;">综合态势</li>
+      <li style="background: url('/src/assets/img/icon2.png') no-repeat center / 200%;">园测数据</li>
+      <li style="background: url('/src/assets/img/icon3.png') no-repeat center / 200%;">监控安防</li>
+      <li style="background: url('/src/assets/img/icon4.png') no-repeat center / 200%;">能源管理</li>
     </ul>
+    <img src="./assets/img/footer.png" style="width: 100%;transform: scale(0.8);padding-left: 0.3vw;">
   </div>
 </template>
 <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
@@ -69,40 +66,36 @@
 <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 <style scoped>
-* {
-  all:unset;
-  box-sizing: border-box;
-}
-p {
-  display: block;
-}
+* {all:unset;box-sizing: border-box;}
+p {display: block;}
+
 .footer{
   position: fixed;
   bottom: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
   width: 100vw;
   height: 15vh;
-  background: url(./assets/img/footer.png) center bottom no-repeat;
-  background-size: 80%;
   z-index: 10; /* 高于3D场景 */
 }
 
 .footer ul{ 
-  width: fit-content;
   display: flex;
-  gap: 3vw;
+  width: fit-content;
   margin: 0 auto;
+  gap: 3vw;
 }
 .footer ul li{
-  width: 6vw;
-  height: 10vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 6vw;
+  height: 10vh;
+  color: #ffffff;
   font-size: 1vw;
-  padding: 1.2vw;
 }
-
 /* ////////////////////////////////////////////// 全屏3D容器 ////////////////////////////////////////////// */
 .fullscreen-container {
   position: fixed;
@@ -126,16 +119,16 @@ p {
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  align-items: flex-start;/* 垂直居中 */
   width: 100vw;
   height: 11vh;
+  color: #127BD6;
   padding-bottom: 5vh;
   background: url(./assets/img/header.png) center repeat-x;
   mask-image: linear-gradient(to bottom,black 65%,transparent 100%);
   z-index: 10; /* 高于3D场景 */
-  color: #127BD6;
   /*pointer-events: none; /* 不拦截3D交互 */
-  display: flex;
-  align-items: flex-start;/* 垂直居中 */
 }
 /* 标题 */
 .header h1 {
@@ -156,8 +149,8 @@ p {
   left: 0;
   display: flex;
   align-items: flex-end;
-  margin: 0.8vh 0 0 2vh;
   font-weight: bold;
+  margin: 0.8vh 0 0 2vh;
 }
 
 .header .info .ZYXX { 
@@ -171,9 +164,9 @@ p {
 /* 时间 */
 .header .time {
   position: absolute;
-  display: flex;
   top: 0;
   right: 0;
+  display: flex;
   align-items: center;
   margin: 0.8vh 2vh 0 0;
 }
