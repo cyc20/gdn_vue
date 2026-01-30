@@ -15,7 +15,7 @@
 
 <Footer 
   :active-nav="activeNav" 
-  :show-panels="showPanels" 
+  :show-panels="showPanels"
   @nav-change="handleNavChange" 
 ></Footer>
 

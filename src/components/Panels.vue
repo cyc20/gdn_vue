@@ -54,25 +54,18 @@ const rightPanelTransform = computed(() => {
 .panel {
   position: fixed;
   top: 7vh;
-  /* 避开新标题区域高度 */
   bottom: 3vh;
-  /* 避开底部导航栏 */
   width: 25vw;
-  /* 面板宽度 */
   padding: 20px;
   box-sizing: border-box;
   z-index: 10;
-  /* 高于3D场景 */
-  pointer-events: auto;
-  /* 开启交互 */
-  transition: transform 0.3s ease;
-  /* 添加滑动动画 */
+  pointer-events: none;
+  transition: transform 0.3s ease;  /* 添加滑动动画 */
 }
 
 /* 左侧面板 - 居中靠左 */
 .left-p {
   left: 0;
-  /* 直接贴到左边 */
   text-align: left;
   margin: auto;
 }
@@ -80,7 +73,6 @@ const rightPanelTransform = computed(() => {
 /* 右侧面板 - 居中靠右 */
 .right-p {
   right: 0;
-  /* 直接贴到右边 */
   text-align: left;
   margin: auto;
 }
@@ -91,8 +83,7 @@ const rightPanelTransform = computed(() => {
   font-size: 16px;
   line-height: 1.6;
   height: 100%;
-  overflow-y: auto;
-  /* 内容超出时滚动 */
+  overflow-y: auto;  /* 内容超出时滚动 */
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
   white-space: pre-line;
 }

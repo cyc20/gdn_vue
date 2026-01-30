@@ -83,7 +83,7 @@ onMounted(() => {
   background: url(../assets/img/header.png) center repeat-x;
   mask-image: linear-gradient(to bottom,black 65%,transparent 100%);
   z-index: 10; /* 高于3D场景 */
-  /*pointer-events: none; /* 不拦截3D交互 */
+  pointer-events: none;
 }
 /* 标题 */
 .header h1 {

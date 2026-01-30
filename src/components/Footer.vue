@@ -51,6 +51,7 @@ const navs = [
   justify-content: end;
   width: 100vw;
   z-index: 10;
+  pointer-events: none;
 }
 
 .footer ul {
@@ -84,5 +85,6 @@ const navs = [
   height: 100%;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
 }
 </style>
