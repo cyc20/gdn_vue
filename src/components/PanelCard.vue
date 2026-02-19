@@ -22,12 +22,12 @@ const props = defineProps({
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.1); /* 半透明背景，适配面板深色风格 */
   backdrop-filter: blur(8px); /* 毛玻璃效果，提升视觉质感 */
-  margin-bottom: 16px;
+  margin-bottom: 2vh;
   overflow: hidden;
 }
 
 .card-title {
-  padding: 12px 16px;
+  padding: 1vh 1vw;
   font-size: 17px;
   font-weight: 500;
   color: #ffffff;
@@ -35,13 +35,6 @@ const props = defineProps({
 }
 
 .card-body {
-  padding: 16px;
-}
-
-.card-footer {
-  padding: 12px 16px;
-  font-size: 14px;
-  color: #e0e0e0;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1vh 1vw;
 }
 </style>
