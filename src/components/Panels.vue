@@ -1,34 +1,49 @@
 <template>
   <!-- 左侧内容区域 -->
-  <div class="panel left-p" :style="{ transform: `translateX(${leftPanelTransform})` }">
+  <div class="panel left-p" :style="{transform: `translateX(${leftPanelTransform})`,left: 0 }">
     <div class="content">
-      <PanelCard :title="currentNavItem.name">
-        <div>{{ panelContent.left }}</div>
+      <!-- 左侧第一个卡片 -->
+      <PanelCard :title="currentNavItem.cards[0].title">
+        <div v-if="currentNavItem.cards[0].chartConfig" style="width: 100%; height: 25vh;">
+          <canvas ref="leftChart1"></canvas>
+        </div>
+        <div v-else>{{ currentNavItem.cards[0].left }}</div>
+      </PanelCard>
+      
+      <!-- 左侧第二个卡片 -->
+      <PanelCard :title="currentNavItem.cards[1].title">
+        <div v-if="currentNavItem.cards[1].chartConfig" style="width: 100%; height: 25vh;">
+          <canvas ref="leftChart2"></canvas>
+        </div>
+        <div v-else>{{ currentNavItem.cards[1].left }}</div>
       </PanelCard>
     </div>
   </div>
 
   <!-- 右侧内容区域 -->
-  <div class="panel right-p" :style="{ transform: `translateX(${rightPanelTransform})` }">
+  <div class="panel right-p" :style="{ transform: `translateX(${rightPanelTransform})`,right: 0 }">
     <div class="content">
-      <!-- 复用 PanelCard 组件，放入 Chart.js 图表 -->
-      <PanelCard title="数据趋势图表（Chart.js 示范）">
-        <!-- 折线图容器，必须指定宽高（Chart.js 要求） -->
-        <div style="width: 100%; height: 25vh;">
-          <canvas ref="chartCanvas"></canvas>
+      <!-- 右侧第一个卡片 -->
+      <PanelCard :title="currentNavItem.cards[2].title">
+        <div v-if="currentNavItem.cards[2].chartConfig" style="width: 100%; height: 25vh;">
+          <canvas ref="rightChart1"></canvas>
         </div>
+        <div v-else>{{ currentNavItem.cards[2].right }}</div>
       </PanelCard>
 
-      <!-- 原有右侧面板文本内容（保留，不破坏原有逻辑） -->
-      <PanelCard :title="currentNavItem.name">
-        <div>{{ panelContent.right }}</div>
+      <!-- 右侧第二个卡片 -->
+      <PanelCard :title="currentNavItem.cards[3].title">
+        <div v-if="currentNavItem.cards[3].chartConfig" style="width: 100%; height: 25vh;">
+          <canvas ref="rightChart2"></canvas>
+        </div>
+        <div v-else>{{ currentNavItem.cards[3].right }}</div>
       </PanelCard>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 // 1. 导入自定义 Card 组件
 import PanelCard from './PanelCard.vue'
 // 2. 导入 Chart.js 核心及相关插件
@@ -57,30 +72,222 @@ const props = defineProps({
 const emit = defineEmits(['nav-change'])
 
 // 获取 canvas 引用
-const chartCanvas = ref(null)
-let chartInstance = null
+const leftChart1 = ref(null)
+const leftChart2 = ref(null)
+const rightChart1 = ref(null)
+const rightChart2 = ref(null)
+let chartInstances = {
+  left1: null,
+  left2: null,
+  right1: null,
+  right2: null
+}
 
-// 导航栏选项配置（移至此处统一管理）
+// 导航栏选项配置（每个导航项包含4个卡片：左上、左下、右上、右下）
 const navItems = ref([
   {
     name: '首页',
-    left: '3D场景概览\n园区整体数据\n实时监控状态',
-    right: '设备在线率：98%\n环境温度：25℃\n湿度：60%\n风速：2m/s'
+    cards: [
+      {
+        title: '数据趋势图表',
+        left: '',
+        right: '',
+        chartConfig: {
+          data: {
+            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+            datasets: [{
+              label: '月度访问量',
+              data: [1200, 1900, 1500, 2500, 2200, 3000],
+              borderColor: '#4fc3f7',
+              backgroundColor: 'rgba(79, 195, 247, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '园区概览',
+        left: '3D场景概览\n园区整体数据\n实时监控状态',
+        right: '设备在线率：98%\n环境温度：25℃\n湿度：60%\n风速：2m/s'
+      },
+      {
+        title: '设备状态',
+        left: '',
+        right: '在线设备：106台\n离线设备：0台\n故障设备：0台',
+        chartConfig: {
+          data: {
+            labels: ['照明', '监控', '传感器', '其他'],
+            datasets: [{
+              label: '设备数量',
+              data: [56, 32, 18, 10],
+              borderColor: '#9ccc65',
+              backgroundColor: 'rgba(156, 204, 101, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '环境监测',
+        left: '',
+        right: '温度：25℃\n湿度：60%\n风速：2m/s\n气压：1013hPa'
+      }
+    ]
   },
   {
     name: '数据监控',
-    left: '能耗数据统计\n设备运行时长\n故障报警记录',
-    right: '今日能耗：1200kWh\n本月能耗：35000kWh\n故障数量：0'
+    cards: [
+      {
+        title: '能耗分析',
+        left: '',
+        right: '',
+        chartConfig: {
+          data: {
+            labels: ['周一', '周二', '周三', '周四', '周五', '周六'],
+            datasets: [{
+              label: '日能耗(kWh)',
+              data: [200, 250, 300, 280, 320, 260],
+              borderColor: '#ff9800',
+              backgroundColor: 'rgba(255, 152, 0, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '运行时长统计',
+        left: '设备运行时长\n平均运行时间\n最长运行设备',
+        right: '总运行时长：1200小时\n平均时长：12小时\n最长：照明系统'
+      },
+      {
+        title: '报警记录',
+        left: '',
+        right: '今日报警：0次\n本周报警：3次\n本月报警：12次',
+        chartConfig: {
+          data: {
+            labels: ['紧急', '重要', '一般', '提示'],
+            datasets: [{
+              label: '报警次数',
+              data: [0, 1, 5, 6],
+              borderColor: '#f44336',
+              backgroundColor: 'rgba(244, 67, 54, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '历史数据',
+        left: '',
+        right: '昨日能耗：1180kWh\n上周同期：1250kWh\n上月同期：32000kWh'
+      }
+    ]
   },
   {
     name: '设备管理',
-    left: '1. 照明设备（56台）\n2. 监控设备（32台）\n3. 环境传感器（18台）',
-    right: '在线设备：104台\n离线设备：2台\n待维护：0台'
+    cards: [
+      {
+        title: '设备分布',
+        left: '',
+        right: '',
+        chartConfig: {
+          data: {
+            labels: ['A区', 'B区', 'C区', 'D区'],
+            datasets: [{
+              label: '设备密度',
+              data: [28, 35, 22, 21],
+              borderColor: '#9c27b0',
+              backgroundColor: 'rgba(156, 39, 176, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '设备清单',
+        left: '1. 照明设备（56台）\n2. 监控设备（32台）\n3. 环境传感器（18台）\n4. 其他设备（10台）',
+        right: '总计：116台\n在线：114台\n离线：2台'
+      },
+      {
+        title: '维护计划',
+        left: '',
+        right: '待维护：3台\n计划维护：8台\n已完成：15台',
+        chartConfig: {
+          data: {
+            labels: ['待处理', '处理中', '已完成'],
+            datasets: [{
+              label: '维护任务',
+              data: [3, 8, 15],
+              borderColor: '#00bcd4',
+              backgroundColor: 'rgba(0, 188, 212, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '设备详情',
+        left: '',
+        right: '最新上线：摄像头007\n最近离线：传感器012\n故障修复：照明023'
+      }
+    ]
   },
   {
     name: '系统设置',
-    left: '用户权限管理\n场景参数配置\n数据备份设置',
-    right: '当前登录用户：管理员\n最后备份时间：2026-01-18\n自动备份：开启'
+    cards: [
+      {
+        title: '性能监控',
+        left: '',
+        right: '',
+        chartConfig: {
+          data: {
+            labels: ['CPU', '内存', '磁盘', '网络'],
+            datasets: [{
+              label: '使用率(%)',
+              data: [45, 65, 30, 75],
+              borderColor: '#e91e63',
+              backgroundColor: 'rgba(233, 30, 99, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '用户管理',
+        left: '管理员账户\n操作员账户\n访客账户\n权限分配',
+        right: '在线用户：3人\n总用户数：12人\n活跃用户：8人'
+      },
+      {
+        title: '备份状态',
+        left: '',
+        right: '上次备份：2026-01-18\n备份大小：2.3GB\n备份状态：成功',
+        chartConfig: {
+          data: {
+            labels: ['成功', '失败', '进行中'],
+            datasets: [{
+              label: '备份次数',
+              data: [15, 2, 1],
+              borderColor: '#8bc34a',
+              backgroundColor: 'rgba(139, 195, 74, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          }
+        }
+      },
+      {
+        title: '系统信息',
+        left: '',
+        right: '系统版本：v2.1.0\n运行时间：15天\n最后重启：2026-01-03'
+      }
+    ]
   }
 ])
 
@@ -104,97 +311,84 @@ const rightPanelTransform = computed(() => {
   return props.showPanels ? '0' : '100%'
 })
 
-// 4. 定义 Chart.js 图表数据（折线图示例）
-const chartData = {
-  // X 轴分类标签
-  labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-  // 数据集（可多组，实现多折线）
-  datasets: [
-    {
-      label: '月度访问量',
-      data: [1200, 1900, 1500, 2500, 2200, 3000],
-      borderColor: '#4fc3f7', // 折线颜色
-      backgroundColor: 'rgba(79, 195, 247, 0.2)', // 填充颜色
-      tension: 0.3, // 折线平滑度
-      fill: true // 是否填充折线下方区域
-    },
-    {
-      label: '月度注册量',
-      data: [500, 800, 600, 1200, 1000, 1800],
-      borderColor: '#9ccc65',
-      backgroundColor: 'rgba(156, 204, 101, 0.2)',
-      tension: 0.3,
-      fill: true
-    }
-  ]
-}
-
-// 5. 定义 Chart.js 图表配置项
+// 通用图表配置
 const chartOptions = {
-  responsive: true, // 响应式（适配容器宽高）
-  maintainAspectRatio: false, // 不保持宽高比（允许自定义高度）
+  responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'top', // 图例位置
-      labels: {
-        color: '#ffffff' // 图例文字颜色（适配面板样式）
-      }
+      position: 'top',
+      labels: { color: '#ffffff' }
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.7)', // 提示框背景
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
       titleColor: '#ffffff',
       bodyColor: '#e0e0e0'
     }
   },
   scales: {
-    // X 轴配置
     x: {
-      ticks: {
-        color: '#e0e0e0' // X 轴文字颜色
-      },
-      grid: {
-        color: 'rgba(255, 255, 255, 0.1)' // X 轴网格线颜色
-      }
+      ticks: { color: '#e0e0e0' },
+      grid: { color: 'rgba(255, 255, 255, 0.1)' }
     },
-    // Y 轴配置
     y: {
-      ticks: {
-        color: '#e0e0e0' // Y 轴文字颜色
-      },
-      grid: {
-        color: 'rgba(255, 255, 255, 0.1)' // Y 轴网格线颜色
-      },
-      beginAtZero: true // Y 轴从 0 开始
+      ticks: { color: '#e0e0e0' },
+      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      beginAtZero: true
     }
   }
 }
 
-// 6. 初始化图表函数
-const initChart = () => {
-  if (chartCanvas.value && !chartInstance) {
-    const ctx = chartCanvas.value.getContext('2d')
-    chartInstance = new Chart(ctx, {
+// 销毁所有图表实例
+const destroyAllCharts = () => {
+  Object.values(chartInstances).forEach(instance => {
+    if (instance) {
+      instance.destroy()
+    }
+  })
+  chartInstances = { left1: null, left2: null, right1: null, right2: null }
+}
+
+// 初始化单个图表
+const initChart = (canvasRef, cardIndex) => {
+  if (canvasRef.value && currentNavItem.value.cards[cardIndex]?.chartConfig) {
+    const ctx = canvasRef.value.getContext('2d')
+    return new Chart(ctx, {
       type: 'line',
-      data: chartData,
+      data: currentNavItem.value.cards[cardIndex].chartConfig.data,
       options: chartOptions
     })
   }
+  return null
 }
 
-// 7. 在组件挂载后初始化图表
-onMounted(() => {
-  // 等待 DOM 更新后再初始化图表
+// 初始化所有图表
+const initAllCharts = () => {
+  destroyAllCharts()
   setTimeout(() => {
-    initChart()
+    chartInstances.left1 = initChart(leftChart1, 0)
+    chartInstances.left2 = initChart(leftChart2, 1)
+    chartInstances.right1 = initChart(rightChart1, 2)
+    chartInstances.right2 = initChart(rightChart2, 3)
   }, 100)
+}
+
+// 在组件挂载后初始化图表
+onMounted(() => {
+  initAllCharts()
 })
 
-// 8. 组件卸载时销毁图表实例
+// 监听导航变化
+watch(
+  () => props.activeNav,
+  () => {
+    initAllCharts()
+  }
+)
+
+// 组件卸载时销毁图表实例
 // onUnmounted(() => {
-//   if (chartInstance) {
-//     chartInstance.destroy()
-//     chartInstance = null
-//   }
+//   destroyAllCharts()
 // })
 </script>
 
@@ -214,22 +408,10 @@ onMounted(() => {
   padding: 20px;
   box-sizing: border-box;
   z-index: 10;
+  margin: auto;
+  text-align: left;
   pointer-events: auto; /* 修正：原有 none 会导致图表无法交互（如提示框），改为 auto */
   transition: transform 0.3s ease;  /* 添加滑动动画 */
-}
-
-/* 左侧面板 - 居中靠左 */
-.left-p {
-  left: 0;
-  text-align: left;
-  margin: auto;
-}
-
-/* 右侧面板 - 居中靠右 */
-.right-p {
-  right: 0;
-  text-align: left;
-  margin: auto;
 }
 
 /* 面板内容样式 */
@@ -238,7 +420,7 @@ onMounted(() => {
   font-size: 16px;
   line-height: 1.6;
   height: 100%;
-  overflow-y: auto;  /* 内容超出时滚动 */
+  overflow: hidden;  /* 内容超出时不滚动 */
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
   white-space: pre-line;
 }

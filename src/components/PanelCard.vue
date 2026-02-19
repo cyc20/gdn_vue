@@ -1,17 +1,7 @@
 <template>
   <div class="panel-card">
-    <!-- 卡片标题（可选） -->
-    <div class="card-title" v-if="title">
-      {{ title }}
-    </div>
-    <!-- 卡片主体内容（默认插槽，用于放置图表、文本等内容） -->
-    <div class="card-body">
-      <slot></slot>
-    </div>
-    <!-- 卡片底部（可选，插槽） -->
-    <div class="card-footer" v-if="showFooter">
-      <slot name="footer"></slot>
-    </div>
+    <div class="card-title" v-if="title">{{ title }}</div>
+    <div class="card-body"><slot/></div>
   </div>
 </template>
 
@@ -22,11 +12,6 @@ const props = defineProps({
   title: {
     type: String,
     default: ''
-  },
-  // 是否显示底部区域
-  showFooter: {
-    type: Boolean,
-    default: false
   }
 })
 </script>
