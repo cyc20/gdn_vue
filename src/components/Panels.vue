@@ -3,10 +3,103 @@
   <div class="panel" :style="{ transform: `translateX(${leftPanelTransform})`, left: 0 }">
 
     <PanelCard v-for="(card, index) in leftCards" :key="`left-${index}`" :title="card.title || ''">
-      <div v-if="card.chartData" style="width: 100%; height: 25vh;">
+      <div v-if="card.lineChart" style="width: 100%; height: 25vh;">
         <canvas :ref="el => setLeftChartRef(el, index)"></canvas>
       </div>
-      <div v-else style="font-size: small;">{{ card.content || '' }}</div>
+      <div v-if="card.barChart" style="width: 100%; height: 25vh;">
+        <canvas :ref="el => setLeftChartRef(el, index)"></canvas>
+      </div>
+      <div v-if="card.progressBar" style="width: 100%;">
+        <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <span style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.label }}</span>
+            <div style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+              <div 
+                :style="{ 
+                  width: item.value + '%', 
+                  height: '100%', 
+                  backgroundColor: '#ff9800',
+                  transition: 'width 0.3s ease'
+                }">
+              </div>
+            </div>
+            <span style="font-size: small; color: #4fc3f7; min-width: 30px; text-align: right;">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="card.listData" style="width: 100%;">
+        <!-- 表头 -->
+        <div style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
+          <div>设备号</div>
+          <div>位置</div>
+          <div>状态</div>
+          <div>时间</div>
+        </div>
+        <!-- 数据行 -->
+        <div v-for="(item, idx) in card.listData" :key="idx" style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.deviceId }}</div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.location }}</div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <span :style="{ color: item.status === '在线' ? '#4caf50' : item.status === '离线' ? '#f44336' : '#ff9800' }">
+              {{ item.status }}
+            </span>
+          </div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.time }}</div>
+        </div>
+      </div>
+      <!-- 园区活动列表 - 优化双行布局 -->
+      <div v-if="card.activities" style="width: 100%;">
+        <div v-for="(activity, idx) in card.activities" :key="idx" 
+             style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
+          <!-- 主容器：左右布局 -->
+          <div style="display: flex; align-items: center;">
+            <!-- 左侧：图标区域（垂直居中） -->
+            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
+              <span v-if="activity.type === 'meeting'" style="color: #4fc3f7; font-size: 16px;">📅</span>
+              <span v-else-if="activity.type === 'maintenance'" style="color: #ff9800; font-size: 16px;">🔧</span>
+              <span v-else-if="activity.type === 'inspection'" style="color: #8bc34a; font-size: 16px;">🔍</span>
+              <span v-else-if="activity.type === 'training'" style="color: #9c27b0; font-size: 16px;">🎓</span>
+              <span v-else style="color: #e0e0e0; font-size: 16px;">📋</span>
+            </div>
+            
+            <!-- 中间：内容区域 -->
+            <div style="flex: 1;">
+              <!-- 第一行：标题 -->
+              <div style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ activity.title }}
+              </div>
+              <!-- 第二行：时间 + 地点 -->
+              <div style="display: flex; align-items: center; font-size: 12px; color: #b0b0b0;">
+                <span style="margin-right: 12px;">
+                  {{ activity.time }}
+                </span>
+                <span v-if="activity.location" style="color: #9e9e9e; display: flex; align-items: center;">
+                  📍 {{ activity.location }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- 右侧：状态标签（垂直居中并放大） -->
+            <div style="display: flex; align-items: center; margin-left: 8px;">
+              <span :style="{ 
+                color: activity.status === '进行中' ? '#4caf50' : 
+                       activity.status === '待开始' ? '#ff9800' : 
+                       activity.status === '已完成' ? '#8bc34a' : '#f44336',
+                fontSize: '12px',
+                fontWeight: '500',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                whiteSpace: 'nowrap'
+              }">
+                {{ activity.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="card.content" style="font-size: small;">{{ card.content || '' }}</div>
+      
     </PanelCard>
 
   </div>
@@ -15,10 +108,102 @@
   <div class="panel" :style="{ transform: `translateX(${rightPanelTransform})`, right: 0 }">
 
     <PanelCard v-for="(card, index) in rightCards" :key="`right-${index}`" :title="card.title || ''">
-      <div v-if="card.chartData" style="width: 100%; height: 25vh;">
+      <div v-if="card.lineChart" style="width: 100%; height: 25vh;">
         <canvas :ref="el => setRightChartRef(el, index)"></canvas>
       </div>
-      <div v-else style="font-size: small;">{{ card.content || '' }}</div>
+      <div v-if="card.barChart" style="width: 100%; height: 25vh;">
+        <canvas :ref="el => setRightChartRef(el, index)"></canvas>
+      </div>
+      <div v-if="card.progressBar" style="width: 100%;">
+        <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <span style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.label }}</span>
+            <div style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+              <div 
+                :style="{ 
+                  width: item.value + '%', 
+                  height: '100%', 
+                  backgroundColor: '#ff9800',
+                  transition: 'width 0.3s ease'
+                }">
+              </div>
+            </div>
+            <span style="font-size: small; color: #4fc3f7; min-width: 30px; text-align: right;">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="card.listData" style="width: 100%;">
+        <!-- 表头 -->
+        <div style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
+          <div>设备号</div>
+          <div>位置</div>
+          <div>状态</div>
+          <div>时间</div>
+        </div>
+        <!-- 数据行 -->
+        <div v-for="(item, idx) in card.listData" :key="idx" style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.deviceId }}</div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.location }}</div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <span :style="{ color: item.status === '在线' ? '#4caf50' : item.status === '离线' ? '#f44336' : '#ff9800' }">
+              {{ item.status }}
+            </span>
+          </div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.time }}</div>
+        </div>
+      </div>
+      <!-- 园区活动列表 - 优化双行布局 -->
+      <div v-if="card.activities" style="width: 100%;">
+        <div v-for="(activity, idx) in card.activities" :key="idx" 
+             style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
+          <!-- 主容器：左右布局 -->
+          <div style="display: flex; align-items: center;">
+            <!-- 左侧：图标区域（垂直居中） -->
+            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
+              <span v-if="activity.type === 'meeting'" style="color: #4fc3f7; font-size: 16px;">📅</span>
+              <span v-else-if="activity.type === 'maintenance'" style="color: #ff9800; font-size: 16px;">🔧</span>
+              <span v-else-if="activity.type === 'inspection'" style="color: #8bc34a; font-size: 16px;">🔍</span>
+              <span v-else-if="activity.type === 'training'" style="color: #9c27b0; font-size: 16px;">🎓</span>
+              <span v-else style="color: #e0e0e0; font-size: 16px;">📋</span>
+            </div>
+            
+            <!-- 中间：内容区域 -->
+            <div style="flex: 1;">
+              <!-- 第一行：标题 -->
+              <div style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ activity.title }}
+              </div>
+              <!-- 第二行：时间 + 地点 -->
+              <div style="display: flex; align-items: center; font-size: 12px; color: #b0b0b0;">
+                <span style="margin-right: 12px;">
+                  {{ activity.time }}
+                </span>
+                <span v-if="activity.location" style="color: #9e9e9e; display: flex; align-items: center;">
+                  📍 {{ activity.location }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- 右侧：状态标签（垂直居中并放大） -->
+            <div style="display: flex; align-items: center; margin-left: 8px;">
+              <span :style="{ 
+                color: activity.status === '进行中' ? '#4caf50' : 
+                       activity.status === '待开始' ? '#ff9800' : 
+                       activity.status === '已完成' ? '#8bc34a' : '#f44336',
+                fontSize: '12px',
+                fontWeight: '500',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                whiteSpace: 'nowrap'
+              }">
+                {{ activity.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="card.content" style="font-size: small;">{{ card.content || '' }}</div>
     </PanelCard>
 
   </div>
@@ -63,7 +248,7 @@ const navItems = ref([
       {
         title: '游客态势',
         position: 'left',
-        chartData: {
+        lineChart: {
           labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
           datasets: [{
             label: '月度访问量',
@@ -83,7 +268,7 @@ const navItems = ref([
       {
         title: '设备状态',
         position: 'right',
-        chartData: {
+        lineChart: {
           labels: ['照明', '监控', '传感器', '其他'],
           datasets: [{
             label: '设备数量',
@@ -96,9 +281,15 @@ const navItems = ref([
         }
       },
       {
-        title: '环境监测',
+        title: '园区活动',
         position: 'right',
-        content: '温度：25℃\n湿度：60%\n风速：2m/s\n气压：1013hPa'
+        activities: [
+          { title: '月度安全会议', time: '今天 14:00', status: '待开始', location: '会议室A', type: 'meeting' },
+          { title: '设备例行维护', time: '明天 09:00', status: '待开始', location: 'B区机房', type: 'maintenance' },
+          { title: '园区安全巡检', time: '02-29 10:30', status: '进行中', location: '全园区', type: 'inspection' },
+          { title: '新员工培训', time: '03-01 15:00', status: '待开始', location: '培训中心', type: 'training' },
+          { title: '消防设施检查', time: '03-02 11:00', status: '待开始', location: '各楼层', type: 'inspection' }
+        ]
       }
     ]
   },
@@ -108,7 +299,7 @@ const navItems = ref([
       {
         title: '能耗分析',
         position: 'left',
-        chartData: {
+        lineChart: {
           labels: ['周一', '周二', '周三', '周四', '周五', '周六'],
           datasets: [{
             label: '日能耗(kWh)',
@@ -128,7 +319,7 @@ const navItems = ref([
       {
         title: '报警记录',
         position: 'right',
-        chartData: {
+        lineChart: {
           labels: ['紧急', '重要', '一般', '提示'],
           datasets: [{
             label: '报警次数',
@@ -153,7 +344,7 @@ const navItems = ref([
       {
         title: '设备分布',
         position: 'left',
-        chartData: {
+        lineChart: {
           labels: ['A区', 'B区', 'C区', 'D区'],
           datasets: [{
             label: '设备密度',
@@ -166,14 +357,20 @@ const navItems = ref([
         }
       },
       {
-        title: '设备清单',
+        title: '风控要素',
         position: 'left',
-        content: '1. 照明设备（56台）\n2. 监控设备（32台）\n3. 环境传感器（18台）\n4. 其他设备（10台）',
+        progressBar: [
+          { label: '安全风险评估', value: 78 },
+          { label: '威胁检测准备', value: 92 },
+          { label: '应急响应速度', value: 85 },
+          { label: '系统防护强度', value: 88 },
+          { label: '合规性检查', value: 95 }
+        ]
       },
       {
         title: '维护计划',
         position: 'right',
-        chartData: {
+        lineChart: {
           labels: ['待处理', '处理中', '已完成'],
           datasets: [{
             label: '维护任务',
@@ -186,10 +383,16 @@ const navItems = ref([
         }
       },
       {
-        title: '设备详情',
+        title: '园区监控',
         position: 'right',
-        content: '最新上线：摄像头007\n最近离线：传感器012\n故障修复：照明023'
-      }
+        listData: [
+          { deviceId: 'CAM-001', location: '东门入口', status: '在线', time: '02-28 18:00' },
+          { deviceId: 'CAM-002', location: '西门出口', status: '在线', time: '02-28 18:00' },
+          { deviceId: 'CAM-003', location: '北区停车场', status: '离线', time: '02-28 17:45' },
+          { deviceId: 'CAM-004', location: '南区花园', status: '在线', time: '02-28 18:00' },
+          { deviceId: 'CAM-005', location: '中央大厅', status: '维护中', time: '02-28 17:30' }
+        ]
+      },
     ]
   },
   {
@@ -198,7 +401,7 @@ const navItems = ref([
       {
         title: '性能监控',
         position: 'left',
-        chartData: {
+        lineChart: {
           labels: ['CPU', '内存', '磁盘', '网络'],
           datasets: [{
             label: '使用率(%)',
@@ -218,7 +421,7 @@ const navItems = ref([
       {
         title: '备份状态',
         position: 'right',
-        chartData: {
+        lineChart: {
           labels: ['成功', '失败', '进行中'],
           datasets: [{
             label: '备份次数',
@@ -322,11 +525,11 @@ const destroyAllCharts = () => {
 
 // 初始化单个图表
 const initChart = (canvasRef, cardData) => {
-  if (canvasRef && cardData?.chartData) {
+  if (canvasRef && cardData?.lineChart) {
     const ctx = canvasRef.getContext('2d')
     return new Chart(ctx, {
       type: 'line',
-      data: cardData.chartData,
+      data: cardData.lineChart,
       options: chartOptions
     })
   }
