@@ -58,16 +58,16 @@ let chartInstances = []
 // 导航栏选项配置（每个导航项包含根据position属性分布的卡片）
 const navItems = ref([
   {
-    name: '首页',
+    name: '综合态势',
     cards: [
       {
-        title: '数据趋势图表',
+        title: '游客态势',
         position: 'left',
         chartData: {
           labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
           datasets: [{
             label: '月度访问量',
-            data: [1200, 1900, 1500, 2500, 2200, 3000],
+            data: [1200, 1900, 1500, 2500, 2200, 2500],
             borderColor: '#4fc3f7',
             backgroundColor: 'rgba(79, 195, 247, 0.2)',
             tension: 0.3,
@@ -103,7 +103,7 @@ const navItems = ref([
     ]
   },
   {
-    name: '数据监控',
+    name: '园测数据',
     cards: [
       {
         title: '能耗分析',
@@ -148,7 +148,7 @@ const navItems = ref([
     ]
   },
   {
-    name: '设备管理',
+    name: '安防监控',
     cards: [
       {
         title: '设备分布',
@@ -193,7 +193,7 @@ const navItems = ref([
     ]
   },
   {
-    name: '系统设置',
+    name: '能源管理',
     cards: [
       {
         title: '性能监控',
