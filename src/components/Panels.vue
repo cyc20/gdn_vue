@@ -12,15 +12,17 @@
       <div v-if="card.progressBar" style="width: 100%;">
         <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
           <div style="display: flex; align-items: center; margin-bottom: 5px;">
-            <span style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.label }}</span>
-            <div style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
-              <div 
-                :style="{ 
-                  width: item.value + '%', 
-                  height: '100%', 
-                  backgroundColor: '#ff9800',
-                  transition: 'width 0.3s ease'
-                }">
+            <span
+              style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{
+              item.label }}</span>
+            <div
+              style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+              <div :style="{
+                width: item.value + '%',
+                height: '100%',
+                backgroundColor: '#ff9800',
+                transition: 'width 0.3s ease'
+              }">
               </div>
             </div>
             <span style="font-size: small; color: #4fc3f7; min-width: 30px; text-align: right;">{{ item.value }}</span>
@@ -29,14 +31,16 @@
       </div>
       <div v-if="card.listData" style="width: 100%;">
         <!-- 表头 -->
-        <div style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
+        <div
+          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
           <div>设备号</div>
           <div>位置</div>
           <div>状态</div>
           <div>时间</div>
         </div>
         <!-- 数据行 -->
-        <div v-for="(item, idx) in card.listData" :key="idx" style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+        <div v-for="(item, idx) in card.listData" :key="idx"
+          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.deviceId }}</div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.location }}</div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -49,23 +53,25 @@
       </div>
       <!-- 园区活动列表 - 优化双行布局 -->
       <div v-if="card.activities" style="width: 100%;">
-        <div v-for="(activity, idx) in card.activities" :key="idx" 
-             style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
+        <div v-for="(activity, idx) in card.activities" :key="idx"
+          style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
           <!-- 主容器：左右布局 -->
           <div style="display: flex; align-items: center;">
             <!-- 左侧：图标区域（垂直居中） -->
-            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
+            <div
+              style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
               <span v-if="activity.type === 'meeting'" style="color: #4fc3f7; font-size: 16px;">📅</span>
               <span v-else-if="activity.type === 'maintenance'" style="color: #ff9800; font-size: 16px;">🔧</span>
               <span v-else-if="activity.type === 'inspection'" style="color: #8bc34a; font-size: 16px;">🔍</span>
               <span v-else-if="activity.type === 'training'" style="color: #9c27b0; font-size: 16px;">🎓</span>
               <span v-else style="color: #e0e0e0; font-size: 16px;">📋</span>
             </div>
-            
+
             <!-- 中间：内容区域 -->
             <div style="flex: 1;">
               <!-- 第一行：标题 -->
-              <div style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <div
+                style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 {{ activity.title }}
               </div>
               <!-- 第二行：时间 + 地点 -->
@@ -78,13 +84,13 @@
                 </span>
               </div>
             </div>
-            
+
             <!-- 右侧：状态标签（垂直居中并放大） -->
             <div style="display: flex; align-items: center; margin-left: 8px;">
-              <span :style="{ 
-                color: activity.status === '进行中' ? '#4caf50' : 
-                       activity.status === '待开始' ? '#ff9800' : 
-                       activity.status === '已完成' ? '#8bc34a' : '#f44336',
+              <span :style="{
+                color: activity.status === '进行中' ? '#4caf50' :
+                  activity.status === '待开始' ? '#ff9800' :
+                    activity.status === '已完成' ? '#8bc34a' : '#f44336',
                 fontSize: '12px',
                 fontWeight: '500',
                 padding: '2px 8px',
@@ -99,7 +105,7 @@
         </div>
       </div>
       <div v-if="card.content" style="font-size: small;">{{ card.content || '' }}</div>
-      
+
     </PanelCard>
 
   </div>
@@ -117,15 +123,17 @@
       <div v-if="card.progressBar" style="width: 100%;">
         <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
           <div style="display: flex; align-items: center; margin-bottom: 5px;">
-            <span style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.label }}</span>
-            <div style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
-              <div 
-                :style="{ 
-                  width: item.value + '%', 
-                  height: '100%', 
-                  backgroundColor: '#ff9800',
-                  transition: 'width 0.3s ease'
-                }">
+            <span
+              style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{
+              item.label }}</span>
+            <div
+              style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+              <div :style="{
+                width: item.value + '%',
+                height: '100%',
+                backgroundColor: '#ff9800',
+                transition: 'width 0.3s ease'
+              }">
               </div>
             </div>
             <span style="font-size: small; color: #4fc3f7; min-width: 30px; text-align: right;">{{ item.value }}</span>
@@ -134,14 +142,16 @@
       </div>
       <div v-if="card.listData" style="width: 100%;">
         <!-- 表头 -->
-        <div style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
+        <div
+          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
           <div>设备号</div>
           <div>位置</div>
           <div>状态</div>
           <div>时间</div>
         </div>
         <!-- 数据行 -->
-        <div v-for="(item, idx) in card.listData" :key="idx" style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+        <div v-for="(item, idx) in card.listData" :key="idx"
+          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.deviceId }}</div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.location }}</div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -154,23 +164,25 @@
       </div>
       <!-- 园区活动列表 - 优化双行布局 -->
       <div v-if="card.activities" style="width: 100%;">
-        <div v-for="(activity, idx) in card.activities" :key="idx" 
-             style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
+        <div v-for="(activity, idx) in card.activities" :key="idx"
+          style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
           <!-- 主容器：左右布局 -->
           <div style="display: flex; align-items: center;">
             <!-- 左侧：图标区域（垂直居中） -->
-            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
+            <div
+              style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
               <span v-if="activity.type === 'meeting'" style="color: #4fc3f7; font-size: 16px;">📅</span>
               <span v-else-if="activity.type === 'maintenance'" style="color: #ff9800; font-size: 16px;">🔧</span>
               <span v-else-if="activity.type === 'inspection'" style="color: #8bc34a; font-size: 16px;">🔍</span>
               <span v-else-if="activity.type === 'training'" style="color: #9c27b0; font-size: 16px;">🎓</span>
               <span v-else style="color: #e0e0e0; font-size: 16px;">📋</span>
             </div>
-            
+
             <!-- 中间：内容区域 -->
             <div style="flex: 1;">
               <!-- 第一行：标题 -->
-              <div style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <div
+                style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 {{ activity.title }}
               </div>
               <!-- 第二行：时间 + 地点 -->
@@ -183,13 +195,13 @@
                 </span>
               </div>
             </div>
-            
+
             <!-- 右侧：状态标签（垂直居中并放大） -->
             <div style="display: flex; align-items: center; margin-left: 8px;">
-              <span :style="{ 
-                color: activity.status === '进行中' ? '#4caf50' : 
-                       activity.status === '待开始' ? '#ff9800' : 
-                       activity.status === '已完成' ? '#8bc34a' : '#f44336',
+              <span :style="{
+                color: activity.status === '进行中' ? '#4caf50' :
+                  activity.status === '待开始' ? '#ff9800' :
+                    activity.status === '已完成' ? '#8bc34a' : '#f44336',
                 fontSize: '12px',
                 fontWeight: '500',
                 padding: '2px 8px',
@@ -262,12 +274,12 @@ const navItems = ref([
       },
       {
         title: '园区概览',
-        position: 'left',
+        position: 'right',
         content: '设备在线率：98%\n环境温度：25℃\n湿度：60%\n风速：2m/s'
       },
       {
         title: '设备状态',
-        position: 'right',
+        position: 'left',
         lineChart: {
           labels: ['照明', '监控', '传感器', '其他'],
           datasets: [{
@@ -299,16 +311,11 @@ const navItems = ref([
       {
         title: '能耗分析',
         position: 'left',
-        lineChart: {
-          labels: ['周一', '周二', '周三', '周四', '周五', '周六'],
-          datasets: [{
-            label: '日能耗(kWh)',
-            data: [200, 250, 300, 280, 320, 260],
-            borderColor: '#ff9800',
-            backgroundColor: 'rgba(255, 152, 0, 0.2)',
-            tension: 0.3,
-            fill: true
-          }]
+        gaugeChart: {
+          minValue: 0,
+          maxValue: 100,
+          currentValue: 46.3,
+          unit: '%'
         }
       },
       {
@@ -610,7 +617,8 @@ watch(
   z-index: 10;
   margin: auto;
   color: #fff;
-  white-space: pre-line;  /* 使/n生效 */
+  white-space: pre-line;
+  /* 使/n生效 */
   text-align: left;
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
