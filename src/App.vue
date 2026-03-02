@@ -29,6 +29,16 @@
   {{ isFullscreen ? '❐' : '⛶' }}
 </button>
 
+<!-- 音乐控制按钮 -->
+<button 
+  class="music-toggle"
+  @click="toggleMusic"
+  :title="isMusicPlaying ? '暂停音乐' : '播放音乐'"
+  style="font-size: 16px;"
+>
+  {{ isMusicPlaying ? '⏸︎' : '▶︎' }}
+</button>
+
 <!-- 竖屏遮罩提示层 -->
 <div v-if="showPortraitOverlay" class="portrait-overlay">
   <div class="overlay-content">
@@ -56,6 +66,42 @@ const showPortraitOverlay = ref(false) // 竖屏遮罩显示状态
 const isPageVisible = ref(true)
 const isInitializing = ref(true) // 初始化状态
 const isFullscreen = ref(false) // 全屏状态
+const isMusicPlaying = ref(false) // 音乐播放状态
+let audioElement = null // 音频元素引用
+
+// 音乐控制功能
+const toggleMusic = () => {
+  // 创建音频元素（如果不存在）
+  if (!audioElement) {
+    // 使用public目录下的音乐文件
+    audioElement = new Audio('/music/采耳的园林.ogg')
+    audioElement.loop = true // 循环播放
+    audioElement.volume = 0.3 // 设置音量
+  }
+  
+  if (!isMusicPlaying.value) {
+    // 播放音乐
+    audioElement.play()
+      .then(() => {
+        isMusicPlaying.value = true
+        console.log('音乐开始播放')
+      })
+      .catch(error => {
+        console.error('音乐播放失败:', error)
+        // 可能是用户未交互，尝试静音播放
+        audioElement.muted = true
+        audioElement.play().then(() => {
+          isMusicPlaying.value = true
+          console.log('音乐静音播放')
+        })
+      })
+  } else {
+    // 暂停音乐
+    audioElement.pause()
+    isMusicPlaying.value = false
+    console.log('音乐暂停')
+  }
+}
 
 // 检测是否为移动设备
 const isMobileDevice = () => {
@@ -359,6 +405,35 @@ document.addEventListener('fullscreenchange', () => {
 }
 
 .fullscreen-toggle:active {
+  transform: scale(0.95);
+}
+
+/* 音乐控制按钮样式 */
+.music-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 70px; /* 距离右边70px，紧贴全屏按钮左侧（全屏按钮40px宽 + 10px间距） */
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.music-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.music-toggle:active {
   transform: scale(0.95);
 }
 
