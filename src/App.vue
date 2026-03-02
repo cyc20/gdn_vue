@@ -217,7 +217,7 @@ const handleNavChange = (index) => {
   }
 }
 
-// 监听竖屏状态变化
+// 监听竖屏状态变化啊
 watch(isMobilePortrait, (newVal) => {
   showPortraitOverlay.value = newVal
   console.log(`竖屏状态变化: ${newVal}`)
