@@ -13,20 +13,20 @@
       </div>
       
       <!-- 仪表盘图表 -->
-      <div v-if="card.gaugeChart" style="width: 100%; height: 25vh; display: flex; align-items: center;">
+      <div v-if="card.gaugeChart" style="width: 100%; height: 25vh; display: flex; align-items: center; justify-content: space-between;">
         <!-- 左侧数据面板 -->
-        <div style="flex: 1; padding-right: 12px;">
-          <div style="background: rgba(79, 195, 247, 0.1); border-radius: 6px; padding: 8px; margin-bottom: 6px;">
-            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">📊 实时监测</div>
-            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+        <div style="flex: 1; padding-right: 1.2vh; display: flex; flex-direction: column; justify-content: center;">
+          <div style="background: rgba(79, 195, 247, 0.1); border-radius: 0.6vh; padding: 0.8vh; margin-bottom: 0.6vh;">
+            <div style="font-size: 1.2vh; color: #e0e0e0; margin-bottom: 0.4vh;">📊 实时监测</div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.1vh;">
               <span style="color: #b0b0b0;">当前功率</span>
               <span style="color: #4fc3f7; font-weight: 500;">{{ (gaugeValue * 12.5).toFixed(1) }} kW</span>
             </div>
           </div>
           
-          <div style="background: rgba(76, 175, 80, 0.1); border-radius: 6px; padding: 8px; margin-bottom: 6px;">
-            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">📈 效率分析</div>
-            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <div style="background: rgba(76, 175, 80, 0.1); border-radius: 0.6vh; padding: 0.8vh; margin-bottom: 0.6vh;">
+            <div style="font-size: 1.2vh; color: #e0e0e0; margin-bottom: 0.4vh;">📈 效率分析</div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.1vh;">
               <span style="color: #b0b0b0;">能效等级</span>
               <span style="color: #4caf50; font-weight: 500;">
                 {{ gaugeValue < 30 ? '优秀' : gaugeValue < 60 ? '良好' : '一般' }}
@@ -34,24 +34,24 @@
             </div>
           </div>
           
-          <div style="background: rgba(255, 152, 0, 0.1); border-radius: 6px; padding: 8px;">
-            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">⚠️ 预警信息</div>
-            <div style="font-size: 11px; color: #ff9800;">
+          <div style="background: rgba(255, 152, 0, 0.1); border-radius: 0.6vh; padding: 0.8vh;">
+            <div style="font-size: 1.2vh; color: #e0e0e0; margin-bottom: 0.4vh;">⚠️ 预警信息</div>
+            <div style="font-size: 1.1vh; color: #ff9800;">
               {{ gaugeValue > 80 ? '能耗偏高' : '运行正常' }}
             </div>
           </div>
         </div>
         
         <!-- 右侧仪表盘 -->
-        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-          <div style="position: relative; width: 140px; height: 140px;">
+        <div style="flex: 1; display: flex; justify-content: center; align-items: center; position: relative;">
+          <div style="position: relative; width: 14vh; height: 14vh; display: flex; justify-content: center; align-items: center;">
             <!-- 外圈 -->
-            <div style="position: absolute; width: 100%; height: 100%; border: 6px solid rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0.6vh solid rgba(255, 255, 255, 0.1); border-radius: 50%; box-sizing: border-box;"></div>
             <!-- 内圈背景 -->
-            <div style="position: absolute; width: 90%; height: 90%; top: 5%; left: 5%; border: 5px solid rgba(79, 195, 247, 0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 5%; left: 5%; width: 90%; height: 90%; border: 0.5vh solid rgba(79, 195, 247, 0.3); border-radius: 50%; box-sizing: border-box;"></div>
             <!-- 进度弧线 -->
             <div 
-              style="position: absolute; width: 90%; height: 90%; top: 5%; left: 5%; border: 5px solid transparent; border-radius: 50%; transform: rotate(-135deg);"
+              style="position: absolute; top: 5%; left: 5%; width: 90%; height: 90%; border: 0.5vh solid transparent; border-radius: 50%; transform: rotate(-135deg); box-sizing: border-box;"
               :style="{
                 borderTopColor: gaugeValue > 80 ? '#f44336' : gaugeValue > 60 ? '#ff9800' : '#4fc3f7',
                 borderRightColor: gaugeValue > 80 ? '#f44336' : gaugeValue > 60 ? '#ff9800' : '#4fc3f7',
@@ -59,15 +59,15 @@
               }"
             ></div>
             <!-- 中心数值 -->
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1;">
               <div :style="{
-                fontSize: '20px', 
+                fontSize: '2vh', 
                 fontWeight: 'bold', 
                 color: gaugeValue > 80 ? '#f44336' : gaugeValue > 60 ? '#ff9800' : '#4fc3f7'
               }">
                 {{ gaugeValue.toFixed(1) }}{{ card.gaugeChart.unit }}
               </div>
-              <div style="font-size: 10px; color: #b0b0b0; margin-top: 2px;">
+              <div style="font-size: 1vh; color: #b0b0b0; margin-top: 0.2vh;">
                 能耗指数
               </div>
             </div>
@@ -77,24 +77,24 @@
       
       <!-- 监控画面网格布局 -->
       <div v-if="card.gridData" style="width: 100%;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vh; margin-top: 1vh;">
           <div 
             v-for="(camera, idx) in card.gridData" 
             :key="idx"
-            style="background-color: rgba(0, 0, 0, 0.3); border: 1px solid; border-radius: 6px; padding: 8px; aspect-ratio: 4/3; display: flex; flex-direction: column; justify-content: space-between;"
+            style="background-color: rgba(0, 0, 0, 0.3); border: 0.1vh solid; border-radius: 0.6vh; padding: 0.8vh; aspect-ratio: 4/3; display: flex; flex-direction: column; justify-content: space-between;"
             :style="{
               borderColor: camera.status === '在线' ? '#4caf50' : camera.status === '离线' ? '#f44336' : '#ff9800',
-              boxShadow: camera.status === '在线' ? '0 0 8px rgba(76, 175, 80, 0.3)' : 'none'
+              boxShadow: camera.status === '在线' ? '0 0 0.8vh rgba(76, 175, 80, 0.3)' : 'none'
             }"
           >
             <!-- 摄像头标识和状态 -->
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 12px; font-weight: 500; color: #e0e0e0;">{{ camera.id }}</span>
+              <span style="font-size: 1.2vh; font-weight: 500; color: #e0e0e0;">{{ camera.id }}</span>
               <span 
                 :style="{
-                  fontSize: '10px',
-                  padding: '2px 6px',
-                  borderRadius: '3px',
+                  fontSize: '1vh',
+                  padding: '0.2vh 0.6vh',
+                  borderRadius: '0.3vh',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   color: camera.status === '在线' ? '#4caf50' : camera.status === '离线' ? '#f44336' : '#ff9800'
                 }"
@@ -104,12 +104,12 @@
             </div>
             
             <!-- 位置信息 -->
-            <div style="font-size: 11px; color: #b0b0b0; margin: 4px 0; flex: 1; display: flex; align-items: center;">
+            <div style="font-size: 1.1vh; color: #b0b0b0; margin: 0.4vh 0; flex: 1; display: flex; align-items: center;">
               📍 {{ camera.location }}
             </div>
             
             <!-- 时间信息 -->
-            <div style="font-size: 10px; color: #9e9e9e; text-align: right;">
+            <div style="font-size: 1vh; color: #9e9e9e; text-align: right;">
               {{ camera.time }}
             </div>
           </div>
@@ -118,13 +118,13 @@
       
       <!-- 进度条 -->
       <div v-if="card.progressBar" style="width: 100%;">
-        <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+        <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 1.2vh;">
+          <div style="display: flex; align-items: center; margin-bottom: 0.5vh;">
             <span
-              style="font-size: small; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{
+              style="font-size: 1.4vh; color: #e0e0e0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{
               item.label }}</span>
             <div
-              style="flex: 2; margin: 0 10px; height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+              style="flex: 2; margin: 0 1vh; height: 0.8vh; background-color: rgba(255, 255, 255, 0.1); border-radius: 0.4vh; overflow: hidden;">
               <div :style="{
                 width: item.value + '%',
                 height: '100%',
@@ -133,7 +133,7 @@
               }">
               </div>
             </div>
-            <span style="font-size: small; color: #4fc3f7; min-width: 30px; text-align: right;">{{ item.value }}</span>
+            <span style="font-size: 1.4vh; color: #4fc3f7; min-width: 3vh; text-align: right;">{{ item.value }}</span>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@
       <div v-if="card.listData && card.title !== '设备能耗排行'" style="width: 100%;">
         <!-- 表头 -->
         <div
-          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(79, 195, 247, 0.2); border-radius: 4px;">
+          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 0.5vh; font-size: 1.4vh; font-weight: bold; margin-bottom: 0.8vh; padding: 0.5vh; background-color: rgba(79, 195, 247, 0.2); border-radius: 0.4vh;">
           <div>设备号</div>
           <div>位置</div>
           <div>状态</div>
@@ -150,7 +150,7 @@
         </div>
         <!-- 数据行 -->
         <div v-for="(item, idx) in card.listData" :key="idx"
-          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+          style="display: grid; grid-template-columns: 1.3fr 1.3fr 1fr 1.8fr; gap: 0.5vh; font-size: 1.4vh; margin-bottom: 0.6vh; padding: 0.4vh; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.4vh;">
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.deviceId }}</div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.location }}</div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -165,14 +165,14 @@
       <!-- 入侵检测统计分析 -->
       <div v-if="card.intrusionData" style="width: 100%;">
         <div v-for="(item, idx) in card.intrusionData" :key="idx"
-          style="margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.03); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(79, 195, 247, 0.2);">
+          style="margin-bottom: 0.6vh; padding: 0.4vh; background-color: rgba(255, 255, 255, 0.03); border-radius: 0.3vh; display: flex; justify-content: space-between; align-items: center; border: 0.1vh solid rgba(79, 195, 247, 0.2);">
           <!-- 左侧：入侵类型（白色） -->
-          <div style="font-size: 12px; color: #ffffff; flex: 1;">
+          <div style="font-size: 1.2vh; color: #ffffff; flex: 1;">
             {{ item.type }}
           </div>
           
           <!-- 右侧：数量显示 -->
-          <div style="font-size: 13px; color: #4fc3f7; font-weight: 500;">
+          <div style="font-size: 1.3vh; color: #4fc3f7; font-weight: 500;">
             {{ item.count }}次
           </div>
         </div>
@@ -181,13 +181,13 @@
       <!-- 环境监测数据 -->
       <div v-if="card.environmentData" style="width: 100%;">
         <div v-for="(item, idx) in card.environmentData" :key="idx" 
-             style="margin-bottom: 8px; padding: 6px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
-          <div style="font-size: 12px; color: #e0e0e0; flex: 1;">{{ item.name }}</div>
-          <div style="font-size: 12px; color: #4fc3f7; margin: 0 8px; font-weight: 500;">{{ item.value }}{{ item.unit }}</div>
+             style="margin-bottom: 0.8vh; padding: 0.6vh; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.4vh; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 1.2vh; color: #e0e0e0; flex: 1;">{{ item.name }}</div>
+          <div style="font-size: 1.2vh; color: #4fc3f7; margin: 0 0.8vh; font-weight: 500;">{{ item.value }}{{ item.unit }}</div>
           <div :style="{ 
-            fontSize: '11px', 
-            padding: '2px 6px', 
-            borderRadius: '3px', 
+            fontSize: '1.1vh', 
+            padding: '0.2vh 0.6vh', 
+            borderRadius: '0.3vh', 
             backgroundColor: 'rgba(255, 255, 255, 0.1)',
             color: getEnvironmentLevelColor(item.level)
           }">
@@ -199,29 +199,29 @@
       <!-- 园区活动列表 -->
       <div v-if="card.activities" style="width: 100%;">
         <div v-for="(activity, idx) in card.activities" :key="idx"
-          style="margin-bottom: 6px; padding: 5px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 2px solid #4fc3f7;">
+          style="margin-bottom: 0.6vh; padding: 0.5vh; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.4vh; border-left: 0.2vh solid #4fc3f7;">
           <!-- 主容器：左右布局 -->
           <div style="display: flex; align-items: center;">
             <!-- 左侧：图标区域（垂直居中） -->
             <div
-              style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 8px;">
-              <span v-if="activity.type === 'meeting'" style="color: #4fc3f7; font-size: 16px;">📅</span>
-              <span v-else-if="activity.type === 'maintenance'" style="color: #ff9800; font-size: 16px;">🔧</span>
-              <span v-else-if="activity.type === 'inspection'" style="color: #8bc34a; font-size: 16px;">🔍</span>
-              <span v-else-if="activity.type === 'training'" style="color: #9c27b0; font-size: 16px;">🎓</span>
-              <span v-else style="color: #e0e0e0; font-size: 16px;">📋</span>
+              style="display: flex; align-items: center; justify-content: center; width: 2.4vh; height: 2.4vh; margin-right: 0.8vh;">
+              <span v-if="activity.type === 'meeting'" style="color: #4fc3f7; font-size: 1.6vh;">📅</span>
+              <span v-else-if="activity.type === 'maintenance'" style="color: #ff9800; font-size: 1.6vh;">🔧</span>
+              <span v-else-if="activity.type === 'inspection'" style="color: #8bc34a; font-size: 1.6vh;">🔍</span>
+              <span v-else-if="activity.type === 'training'" style="color: #9c27b0; font-size: 1.6vh;">🎓</span>
+              <span v-else style="color: #e0e0e0; font-size: 1.6vh;">📋</span>
             </div>
 
             <!-- 中间：内容区域 -->
             <div style="flex: 1;">
               <!-- 第一行：标题 -->
               <div
-                style="font-size: 13px; color: #ffffff; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                style="font-size: 1.3vh; color: #ffffff; font-weight: 500; margin-bottom: 0.3vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 {{ activity.title }}
               </div>
               <!-- 第二行：时间 + 地点 -->
-              <div style="display: flex; align-items: center; font-size: 12px; color: #b0b0b0;">
-                <span style="margin-right: 12px;">
+              <div style="display: flex; align-items: center; font-size: 1.2vh; color: #b0b0b0;">
+                <span style="margin-right: 1.2vh;">
                   {{ activity.time }}
                 </span>
                 <span v-if="activity.location" style="color: #9e9e9e; display: flex; align-items: center;">
@@ -231,15 +231,15 @@
             </div>
 
             <!-- 右侧：状态标签（垂直居中并放大） -->
-            <div style="display: flex; align-items: center; margin-left: 8px;">
+            <div style="display: flex; align-items: center; margin-left: 0.8vh;">
               <span :style="{
                 color: activity.status === '进行中' ? '#4caf50' :
                   activity.status === '待开始' ? '#ff9800' :
                     activity.status === '已完成' ? '#8bc34a' : '#f44336',
-                fontSize: '12px',
+                fontSize: '1.2vh',
                 fontWeight: '500',
-                padding: '2px 8px',
-                borderRadius: '4px',
+                padding: '0.2vh 0.8vh',
+                borderRadius: '0.4vh',
                 backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 whiteSpace: 'nowrap'
               }">
@@ -254,7 +254,7 @@
       <div v-if="card.listData && card.title === '设备能耗排行'" style="width: 100%;">
         <!-- 表头 -->
         <div
-          style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1.5fr; gap: 5px; font-size: small; font-weight: bold; margin-bottom: 8px; padding: 5px; background-color: rgba(255, 152, 0, 0.2); border-radius: 4px;">
+          style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1.5fr; gap: 0.5vh; font-size: 1.4vh; font-weight: bold; margin-bottom: 0.8vh; padding: 0.5vh; background-color: rgba(255, 152, 0, 0.2); border-radius: 0.4vh;">
           <div>设备名称</div>
           <div>位置</div>
           <div>等级</div>
@@ -262,7 +262,7 @@
         </div>
         <!-- 数据行 -->
         <div v-for="(item, idx) in card.listData" :key="idx"
-          style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1.5fr; gap: 5px; font-size: small; margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; border-left: 3px solid;"
+          style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1.5fr; gap: 0.5vh; font-size: 1.4vh; margin-bottom: 0.6vh; padding: 0.4vh; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.4vh; border-left: 0.3vh solid;"
           :style="{
             borderLeftColor: getEnergyRankingColor(item.status)
           }">
@@ -272,7 +272,7 @@
             <span :style="{ 
               color: getEnergyRankingColor(item.status),
               fontWeight: '500',
-              fontSize: '11px'
+              fontSize: '1.1vh'
             }">
               {{ item.status.replace('耗能', '') }}
             </span>
@@ -282,7 +282,7 @@
       </div>
       
       <!-- 纯文本内容 -->
-      <div v-if="card.content" style="font-size: small;">{{ card.content || '' }}</div>
+      <div v-if="card.content" style="font-size: 1.4vh;">{{ card.content || '' }}</div>
       
       <!-- 插槽内容（用于向后兼容） -->
       <slot/>
@@ -291,7 +291,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, LineController, BarController } from 'chart.js'
 
 // 注册Chart.js组件
@@ -332,12 +332,27 @@ const chartOptions = {
   plugins: {
     legend: {
       position: 'top',
-      labels: { color: '#ffffff' }
+      labels: { 
+        color: '#ffffff',
+        font: {
+          size: window.innerHeight * 0.015, // 基于视口高度的1.5%作为字体大小
+          family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+        },
+        padding: window.innerHeight * 0.01, // 图例项之间的间距
+        usePointStyle: true, // 使用点样式而不是方块
+        pointStyle: 'circle'
+      }
     },
     tooltip: {
       backgroundColor: 'rgba(0, 0, 0, 0.7)',
       titleColor: '#ffffff',
       bodyColor: '#e0e0e0',
+      titleFont: {
+        size: window.innerHeight * 0.018
+      },
+      bodyFont: {
+        size: window.innerHeight * 0.016
+      },
       callbacks: {
         label: function(context) {
           // 根据图表标题判断显示不同的单位
@@ -356,12 +371,20 @@ const chartOptions = {
   },
   scales: {
     x: {
-      ticks: { color: '#e0e0e0' },
+      ticks: { 
+        color: '#e0e0e0',
+        font: {
+          size: window.innerHeight * 0.013
+        }
+      },
       grid: { color: 'rgba(255, 255, 255, 0.1)' }
     },
     y: {
       ticks: { 
         color: '#e0e0e0',
+        font: {
+          size: window.innerHeight * 0.013
+        },
         callback: function(value) {
           if (value >= 1000) {
             return (value / 1000).toFixed(0) + 'k';
@@ -395,16 +418,64 @@ const initChart = (canvasRef, type) => {
     const ctx = canvasRef.getContext('2d')
     const chartType = props.card.barChart ? 'bar' : 'line'
     const chartData = props.card.barChart || props.card.lineChart
-    // 根据图表类型选择配置
-    const options = props.card.barChart ? barChartOptions : chartOptions
     
-    return new Chart(ctx, {
+    // 根据当前窗口大小动态计算字体大小
+    const baseFontSize = window.innerHeight * 0.015;
+    const titleFontSize = window.innerHeight * 0.018;
+    const bodyFontSize = window.innerHeight * 0.016;
+    const tickFontSize = window.innerHeight * 0.013;
+    
+    // 更新图表配置中的字体大小
+    const dynamicChartOptions = JSON.parse(JSON.stringify(chartOptions));
+    dynamicChartOptions.plugins.legend.labels.font.size = baseFontSize;
+    dynamicChartOptions.plugins.legend.labels.padding = window.innerHeight * 0.01;
+    dynamicChartOptions.plugins.tooltip.titleFont.size = titleFontSize;
+    dynamicChartOptions.plugins.tooltip.bodyFont.size = bodyFontSize;
+    dynamicChartOptions.scales.x.ticks.font.size = tickFontSize;
+    dynamicChartOptions.scales.y.ticks.font.size = tickFontSize;
+    
+    // 根据图表类型选择配置
+    const options = props.card.barChart ? 
+      {...barChartOptions, ...dynamicChartOptions} : 
+      dynamicChartOptions;
+    
+    const chartInstance = new Chart(ctx, {
       type: chartType,
       data: chartData,
       options: options
-    })
+    });
+    
+    // 监听窗口大小变化，重新调整图表
+    const handleResize = () => {
+      const newBaseFontSize = window.innerHeight * 0.015;
+      const newTitleFontSize = window.innerHeight * 0.018;
+      const newBodyFontSize = window.innerHeight * 0.016;
+      const newTickFontSize = window.innerHeight * 0.013;
+      
+      chartInstance.options.plugins.legend.labels.font.size = newBaseFontSize;
+      chartInstance.options.plugins.legend.labels.padding = window.innerHeight * 0.01;
+      chartInstance.options.plugins.tooltip.titleFont.size = newTitleFontSize;
+      chartInstance.options.plugins.tooltip.bodyFont.size = newBodyFontSize;
+      chartInstance.options.scales.x.ticks.font.size = newTickFontSize;
+      chartInstance.options.scales.y.ticks.font.size = newTickFontSize;
+      
+      chartInstance.update();
+    };
+    
+    // 添加事件监听器
+    window.addEventListener('resize', handleResize);
+    
+    // 在组件卸载时移除监听器
+    onUnmounted(() => {
+      window.removeEventListener('resize', handleResize);
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+    });
+    
+    return chartInstance;
   }
-  return null
+  return null;
 }
 
 // 获取环境等级对应的颜色
@@ -452,19 +523,19 @@ watch(() => props.card, () => {
 <style scoped>
 .panel-card {
   width: 100%;
-  border-radius: 6px;
+  border-radius: 0.6vh;
   background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.8vh);
   margin-bottom: 2vh;
   overflow: hidden;
 }
 
 .card-title {
   padding: 1vh 1vw;
-  font-size: 17px;
+  font-size: 1.7vh;
   font-weight: 500;
   color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 0.1vh solid rgba(255, 255, 255, 0.2);
 }
 
 .card-body {
