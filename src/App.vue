@@ -220,7 +220,7 @@ const toggleFullscreen = () => {
   }
 }
 
-// 监听全屏状态变化
+// 监听全屏状态变化啊
 document.addEventListener('fullscreenchange', () => {
   isFullscreen.value = document.fullscreenElement !== null
   console.log(`全屏状态变化: ${isFullscreen.value}`)
