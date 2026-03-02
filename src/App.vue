@@ -225,7 +225,82 @@ watch(isMobilePortrait, (newVal) => {
 
 // 生命周期钩子
 onMounted(() => {
-  console.log('App组件挂载')
+  console.log('=== APP组件挂载开始 ===')
+  detectEnvironment()
+  
+  // 检测按钮元素是否存在
+  setTimeout(() => {
+    const fullscreenBtn = document.querySelector('.fullscreen-toggle')
+    const musicBtn = document.querySelector('.music-toggle')
+    
+    console.log('=== 按钮元素检测 ===')
+    console.log('全屏按钮存在:', !!fullscreenBtn)
+    console.log('音乐按钮存在:', !!musicBtn)
+    
+    if (fullscreenBtn) {
+      console.log('全屏按钮样式:', getComputedStyle(fullscreenBtn))
+      console.log('全屏按钮位置:', fullscreenBtn.getBoundingClientRect())
+      console.log('全屏按钮HTML:', fullscreenBtn.outerHTML)
+    }
+    
+    if (musicBtn) {
+      console.log('音乐按钮样式:', getComputedStyle(musicBtn))
+      console.log('音乐按钮位置:', musicBtn.getBoundingClientRect())
+      console.log('音乐按钮HTML:', musicBtn.outerHTML)
+    }
+    
+    // 检测所有fixed定位元素
+    const fixedElements = document.querySelectorAll('[style*="fixed"], *[class*="fixed"]')
+    console.log('=== Fixed定位元素检测 ===')
+    console.log('找到fixed元素数量:', fixedElements.length)
+    fixedElements.forEach((el, index) => {
+      console.log(`Fixed元素${index}:`, {
+        tagName: el.tagName,
+        className: el.className,
+        id: el.id,
+        style: el.style.cssText,
+        computedStyle: getComputedStyle(el).position
+      })
+    })
+    
+    // 检测CSS规则
+    console.log('=== CSS规则检测 ===')
+    console.log('样式表数量:', document.styleSheets.length)
+    Array.from(document.styleSheets).forEach((sheet, index) => {
+      try {
+        console.log(`样式表${index}:`, sheet.href || '内联样式')
+        if (sheet.cssRules) {
+          const fullscreenRules = Array.from(sheet.cssRules).filter(rule => 
+            rule.selectorText && (rule.selectorText.includes('fullscreen') || rule.selectorText.includes('music'))
+          )
+          if (fullscreenRules.length > 0) {
+            console.log(`包含目标选择器的规则:`, fullscreenRules)
+          }
+        }
+      } catch (e) {
+        console.log(`样式表${index}无法访问:`, e.message)
+      }
+    })
+    
+    // 检测z-index情况
+    console.log('=== Z-index层级检测 ===')
+    const allElements = document.querySelectorAll('*')
+    const zIndexElements = Array.from(allElements).filter(el => {
+      const style = getComputedStyle(el)
+      return style.zIndex !== 'auto' && parseInt(style.zIndex) > 1000
+    })
+    
+    console.log('高z-index元素数量:', zIndexElements.length)
+    zIndexElements.slice(0, 10).forEach((el, index) => {
+      console.log(`高z-index元素${index}:`, {
+        tagName: el.tagName,
+        className: el.className,
+        zIndex: getComputedStyle(el).zIndex,
+        position: getComputedStyle(el).position
+      })
+    })
+    
+  }, 1000)
   
   // 初始检测
   setTimeout(() => {
@@ -245,10 +320,31 @@ onMounted(() => {
   
   // 监听强制重载事件
   window.addEventListener('forceAppReload', forcePageReload)
+  
+  // 定期检测按钮状态
+  setInterval(() => {
+    const fullscreenBtn = document.querySelector('.fullscreen-toggle')
+    const musicBtn = document.querySelector('.music-toggle')
+    console.log('=== 定期状态检查 ===', new Date().toLocaleTimeString())
+    console.log('全屏按钮:', fullscreenBtn ? '存在' : '缺失')
+    console.log('音乐按钮:', musicBtn ? '存在' : '缺失')
+    
+    if (fullscreenBtn) {
+      const rect = fullscreenBtn.getBoundingClientRect()
+      console.log('全屏按钮可见性:', {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+        isVisible: rect.width > 0 && rect.height > 0
+      })
+    }
+  }, 5000)
 })
 
 onUnmounted(() => {
-  console.log('App组件卸载')
+  console.log('=== APP组件卸载 ===')
+  console.log('清理所有事件监听器')
   
   // 清理所有事件监听器
   window.removeEventListener('resize', handleResize)
@@ -271,6 +367,55 @@ document.addEventListener('fullscreenchange', () => {
   isFullscreen.value = document.fullscreenElement !== null
   console.log(`全屏状态变化: ${isFullscreen.value}`)
 })
+
+// 网络和环境检测
+const detectEnvironment = () => {
+  console.log('=== 环境检测 ===')
+  
+  // 检测是否为本地环境
+  const isLocalhost = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' ||
+                      window.location.hostname === ''
+  
+  console.log('运行环境:', {
+    hostname: window.location.hostname,
+    protocol: window.location.protocol,
+    port: window.location.port,
+    pathname: window.location.pathname,
+    isLocalhost: isLocalhost
+  })
+  
+  // 检测网络状态
+  console.log('网络状态:', {
+    onLine: navigator.onLine,
+    connection: navigator.connection ? {
+      effectiveType: navigator.connection.effectiveType,
+      downlink: navigator.connection.downlink,
+      rtt: navigator.connection.rtt
+    } : '不支持'
+  })
+  
+  // 检测浏览器特性支持
+  console.log('浏览器支持检测:', {
+    requestFullscreen: !!document.documentElement.requestFullscreen,
+    webkitRequestFullscreen: !!document.documentElement.webkitRequestFullscreen,
+    msRequestFullscreen: !!document.documentElement.msRequestFullscreen,
+    fullscreenEnabled: !!document.fullscreenEnabled,
+    webkitFullscreenEnabled: !!document.webkitFullscreenEnabled
+  })
+  
+  // 检测CSS支持
+  console.log('CSS支持检测:', {
+    backdropFilter: CSS.supports('backdrop-filter', 'blur(10px)'),
+    supportsMethod: !!CSS.supports
+  })
+  
+  // 检测Vue版本和构建信息
+  console.log('Vue信息:', {
+    version: typeof Vue !== 'undefined' ? Vue.version : '未知',
+    devMode: typeof process !== 'undefined' ? process.env.NODE_ENV : '未知'
+  })
+}
 
 </script>
 
