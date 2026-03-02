@@ -52,8 +52,8 @@ let chartInstances = []
 // 导航栏选项配置（从后端API获取）
 const navItems = ref([])
 
-// API基础URL
-const API_BASE_URL = 'http://localhost:8000'
+// API基础URL - 使用用户提供的云端地址
+const API_BASE_URL = 'http://106.14.133.236:8000'
 
 // 获取导航数据
 const fetchNavItems = async () => {
