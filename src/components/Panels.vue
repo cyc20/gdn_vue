@@ -9,6 +9,108 @@
       <div v-if="card.barChart" style="width: 100%; height: 25vh;">
         <canvas :ref="el => setLeftChartRef(el, index)"></canvas>
       </div>
+      <!-- 仪表盘图表 - 能耗分析专用 -->
+      <div v-if="card.gaugeChart" style="width: 100%; height: 25vh; display: flex; align-items: center;">
+        <!-- 左侧数据面板 -->
+        <div style="flex: 1; padding-right: 12px;">
+          <div style="background: rgba(79, 195, 247, 0.1); border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">📊 实时监测</div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+              <span style="color: #b0b0b0;">当前功率</span>
+              <span style="color: #4fc3f7; font-weight: 500;">{{ (dynamicGaugeValue * 12.5).toFixed(1) }} kW</span>
+            </div>
+          </div>
+          
+          <div style="background: rgba(76, 175, 80, 0.1); border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">📈 效率分析</div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+              <span style="color: #b0b0b0;">能效等级</span>
+              <span style="color: #4caf50; font-weight: 500;">
+                {{ dynamicGaugeValue < 30 ? '优秀' : dynamicGaugeValue < 60 ? '良好' : '一般' }}
+              </span>
+            </div>
+          </div>
+          
+          <div style="background: rgba(255, 152, 0, 0.1); border-radius: 6px; padding: 8px;">
+            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">⚠️ 预警信息</div>
+            <div style="font-size: 11px; color: #ff9800;">
+              {{ dynamicGaugeValue > 80 ? '能耗偏高' : '运行正常' }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- 右侧仪表盘 -->
+        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+          <div style="position: relative; width: 140px; height: 140px;">
+            <!-- 外圈 -->
+            <div style="position: absolute; width: 100%; height: 100%; border: 6px solid rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+            <!-- 内圈背景 -->
+            <div style="position: absolute; width: 90%; height: 90%; top: 5%; left: 5%; border: 5px solid rgba(79, 195, 247, 0.3); border-radius: 50%;"></div>
+            <!-- 进度弧线 -->
+            <div 
+              style="position: absolute; width: 90%; height: 90%; top: 5%; left: 5%; border: 5px solid transparent; border-radius: 50%; transform: rotate(-135deg);"
+              :style="{
+                borderTopColor: dynamicGaugeValue > 80 ? '#f44336' : dynamicGaugeValue > 60 ? '#ff9800' : '#4fc3f7',
+                borderRightColor: dynamicGaugeValue > 80 ? '#f44336' : dynamicGaugeValue > 60 ? '#ff9800' : '#4fc3f7',
+                clipPath: `inset(0 0 0 ${100 - (dynamicGaugeValue / (card.gaugeChart.maxValue - card.gaugeChart.minValue)) * 100}%)`
+              }"
+            ></div>
+            <!-- 中心数值 -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+              <div :style="{
+                fontSize: '20px', 
+                fontWeight: 'bold', 
+                color: dynamicGaugeValue > 80 ? '#f44336' : dynamicGaugeValue > 60 ? '#ff9800' : '#4fc3f7'
+              }">
+                {{ dynamicGaugeValue.toFixed(1) }}{{ card.gaugeChart.unit }}
+              </div>
+              <div style="font-size: 10px; color: #b0b0b0; margin-top: 2px;">
+                能耗指数
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 监控画面网格布局 -->
+      <div v-if="card.gridData" style="width: 100%;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+          <div 
+            v-for="(camera, idx) in card.gridData" 
+            :key="idx"
+            style="background-color: rgba(0, 0, 0, 0.3); border: 1px solid; border-radius: 6px; padding: 8px; aspect-ratio: 4/3; display: flex; flex-direction: column; justify-content: space-between;"
+            :style="{
+              borderColor: camera.status === '在线' ? '#4caf50' : camera.status === '离线' ? '#f44336' : '#ff9800',
+              boxShadow: camera.status === '在线' ? '0 0 8px rgba(76, 175, 80, 0.3)' : 'none'
+            }"
+          >
+            <!-- 摄像头标识和状态 -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 500; color: #e0e0e0;">{{ camera.id }}</span>
+              <span 
+                :style="{
+                  fontSize: '10px',
+                  padding: '2px 6px',
+                  borderRadius: '3px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: camera.status === '在线' ? '#4caf50' : camera.status === '离线' ? '#f44336' : '#ff9800'
+                }"
+              >
+                {{ camera.status }}
+              </span>
+            </div>
+            
+            <!-- 位置信息 -->
+            <div style="font-size: 11px; color: #b0b0b0; margin: 4px 0; flex: 1; display: flex; align-items: center;">
+              📍 {{ camera.location }}
+            </div>
+            
+            <!-- 时间信息 -->
+            <div style="font-size: 10px; color: #9e9e9e; text-align: right;">
+              {{ camera.time }}
+            </div>
+          </div>
+        </div>
+      </div>
       <div v-if="card.progressBar" style="width: 100%;">
         <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
           <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -49,6 +151,37 @@
             </span>
           </div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.time }}</div>
+        </div>
+      </div>
+      <!-- 入侵检测统计分析 -->
+      <div v-if="card.intrusionData" style="width: 100%;">
+        <div v-for="(item, idx) in card.intrusionData" :key="idx"
+          style="margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.03); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(79, 195, 247, 0.2);">
+          <!-- 左侧：入侵类型（白色） -->
+          <div style="font-size: 12px; color: #ffffff; flex: 1;">
+            {{ item.type }}
+          </div>
+          
+          <!-- 右侧：数量显示 -->
+          <div style="font-size: 13px; color: #4fc3f7; font-weight: 500;">
+            {{ item.count }}次
+          </div>
+        </div>
+      </div>
+      <div v-if="card.environmentData" style="width: 100%;">
+        <div v-for="(item, idx) in card.environmentData" :key="idx" 
+             style="margin-bottom: 8px; padding: 6px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 12px; color: #e0e0e0; flex: 1;">{{ item.name }}</div>
+          <div style="font-size: 12px; color: #4fc3f7; margin: 0 8px; font-weight: 500;">{{ item.value }}{{ item.unit }}</div>
+          <div :style="{ 
+            fontSize: '11px', 
+            padding: '2px 6px', 
+            borderRadius: '3px', 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            color: getEnvironmentLevelColor(item.level)
+          }">
+            {{ item.level }}
+          </div>
         </div>
       </div>
       <!-- 园区活动列表 - 优化双行布局 -->
@@ -120,6 +253,108 @@
       <div v-if="card.barChart" style="width: 100%; height: 25vh;">
         <canvas :ref="el => setRightChartRef(el, index)"></canvas>
       </div>
+      <!-- 仪表盘图表 - 能耗分析专用 -->
+      <div v-if="card.gaugeChart" style="width: 100%; height: 25vh; display: flex; align-items: center;">
+        <!-- 左侧数据面板 -->
+        <div style="flex: 1; padding-right: 12px;">
+          <div style="background: rgba(79, 195, 247, 0.1); border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">📊 实时监测</div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+              <span style="color: #b0b0b0;">当前功率</span>
+              <span style="color: #4fc3f7; font-weight: 500;">{{ (dynamicGaugeValue * 12.5).toFixed(1) }} kW</span>
+            </div>
+          </div>
+          
+          <div style="background: rgba(76, 175, 80, 0.1); border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">📈 效率分析</div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+              <span style="color: #b0b0b0;">能效等级</span>
+              <span style="color: #4caf50; font-weight: 500;">
+                {{ dynamicGaugeValue < 30 ? '优秀' : dynamicGaugeValue < 60 ? '良好' : '一般' }}
+              </span>
+            </div>
+          </div>
+          
+          <div style="background: rgba(255, 152, 0, 0.1); border-radius: 6px; padding: 8px;">
+            <div style="font-size: 12px; color: #e0e0e0; margin-bottom: 4px;">⚠️ 预警信息</div>
+            <div style="font-size: 11px; color: #ff9800;">
+              {{ dynamicGaugeValue > 80 ? '能耗偏高' : '运行正常' }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- 右侧仪表盘 -->
+        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+          <div style="position: relative; width: 140px; height: 140px;">
+            <!-- 外圈 -->
+            <div style="position: absolute; width: 100%; height: 100%; border: 6px solid rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+            <!-- 内圈背景 -->
+            <div style="position: absolute; width: 90%; height: 90%; top: 5%; left: 5%; border: 5px solid rgba(79, 195, 247, 0.3); border-radius: 50%;"></div>
+            <!-- 进度弧线 -->
+            <div 
+              style="position: absolute; width: 90%; height: 90%; top: 5%; left: 5%; border: 5px solid transparent; border-radius: 50%; transform: rotate(-135deg);"
+              :style="{
+                borderTopColor: card.gaugeChart.currentValue > 80 ? '#f44336' : card.gaugeChart.currentValue > 60 ? '#ff9800' : '#4fc3f7',
+                borderRightColor: card.gaugeChart.currentValue > 80 ? '#f44336' : card.gaugeChart.currentValue > 60 ? '#ff9800' : '#4fc3f7',
+                clipPath: `inset(0 0 0 ${100 - (card.gaugeChart.currentValue / (card.gaugeChart.maxValue - card.gaugeChart.minValue)) * 100}%)`
+              }"
+            ></div>
+            <!-- 中心数值 -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+              <div :style="{
+                fontSize: '20px', 
+                fontWeight: 'bold', 
+                color: card.gaugeChart.currentValue > 80 ? '#f44336' : card.gaugeChart.currentValue > 60 ? '#ff9800' : '#4fc3f7'
+              }">
+                {{ card.gaugeChart.currentValue }}{{ card.gaugeChart.unit }}
+              </div>
+              <div style="font-size: 10px; color: #b0b0b0; margin-top: 2px;">
+                能耗指数
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 监控画面网格布局 -->
+      <div v-if="card.gridData" style="width: 100%;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+          <div 
+            v-for="(camera, idx) in card.gridData" 
+            :key="idx"
+            style="background-color: rgba(0, 0, 0, 0.3); border: 1px solid; border-radius: 6px; padding: 8px; aspect-ratio: 4/3; display: flex; flex-direction: column; justify-content: space-between;"
+            :style="{
+              borderColor: camera.status === '在线' ? '#4caf50' : camera.status === '离线' ? '#f44336' : '#ff9800',
+              boxShadow: camera.status === '在线' ? '0 0 8px rgba(76, 175, 80, 0.3)' : 'none'
+            }"
+          >
+            <!-- 摄像头标识和状态 -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; font-weight: 500; color: #e0e0e0;">{{ camera.id }}</span>
+              <span 
+                :style="{
+                  fontSize: '10px',
+                  padding: '2px 6px',
+                  borderRadius: '3px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: camera.status === '在线' ? '#4caf50' : camera.status === '离线' ? '#f44336' : '#ff9800'
+                }"
+              >
+                {{ camera.status }}
+              </span>
+            </div>
+            
+            <!-- 位置信息 -->
+            <div style="font-size: 11px; color: #b0b0b0; margin: 4px 0; flex: 1; display: flex; align-items: center;">
+              📍 {{ camera.location }}
+            </div>
+            
+            <!-- 时间信息 -->
+            <div style="font-size: 10px; color: #9e9e9e; text-align: right;">
+              {{ camera.time }}
+            </div>
+          </div>
+        </div>
+      </div>
       <div v-if="card.progressBar" style="width: 100%;">
         <div v-for="(item, idx) in card.progressBar" :key="idx" style="margin-bottom: 12px;">
           <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -160,6 +395,37 @@
             </span>
           </div>
           <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.time }}</div>
+        </div>
+      </div>
+      <!-- 入侵检测统计分析 -->
+      <div v-if="card.intrusionData" style="width: 100%;">
+        <div v-for="(item, idx) in card.intrusionData" :key="idx"
+          style="margin-bottom: 6px; padding: 4px; background-color: rgba(255, 255, 255, 0.03); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(79, 195, 247, 0.2);">
+          <!-- 左侧：入侵类型（白色） -->
+          <div style="font-size: 12px; color: #ffffff; flex: 1;">
+            {{ item.type }}
+          </div>
+          
+          <!-- 右侧：数量显示 -->
+          <div style="font-size: 13px; color: #4fc3f7; font-weight: 500;">
+            {{ item.count }}次
+          </div>
+        </div>
+      </div>
+      <div v-if="card.environmentData" style="width: 100%;">
+        <div v-for="(item, idx) in card.environmentData" :key="idx" 
+             style="margin-bottom: 8px; padding: 6px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 12px; color: #e0e0e0; flex: 1;">{{ item.name }}</div>
+          <div style="font-size: 12px; color: #4fc3f7; margin: 0 8px; font-weight: 500;">{{ item.value }}{{ item.unit }}</div>
+          <div :style="{ 
+            fontSize: '11px', 
+            padding: '2px 6px', 
+            borderRadius: '3px', 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            color: getEnvironmentLevelColor(item.level)
+          }">
+            {{ item.level }}
+          </div>
         </div>
       </div>
       <!-- 园区活动列表 - 优化双行布局 -->
@@ -222,7 +488,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watch, nextTick } from 'vue'
+import { computed, ref, onMounted, watch, nextTick, onUnmounted } from 'vue'
 // 1. 导入自定义 Card 组件
 import PanelCard from './PanelCard.vue'
 // 2. 导入 Chart.js 核心及相关插件
@@ -260,33 +526,34 @@ const navItems = ref([
       {
         title: '游客态势',
         position: 'left',
-        lineChart: {
-          labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+        barChart: {
+          labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
           datasets: [{
             label: '月度访问量',
-            data: [1200, 1900, 1500, 2500, 2200, 2500],
+            data: [1300, 1850, 1350, 1900, 2400, 2100, 3100, 3600, 2900, 1800, 1600, 950],
             borderColor: '#4fc3f7',
-            backgroundColor: 'rgba(79, 195, 247, 0.2)',
-            tension: 0.3,
-            fill: true
+            backgroundColor: 'rgba(79, 195, 247, 0.6)',
+            borderWidth: 1,
+            borderRadius: 4,
+            borderSkipped: false
           }]
         }
       },
       {
         title: '园区概览',
         position: 'right',
-        content: '设备在线率：98%\n环境温度：25℃\n湿度：60%\n风速：2m/s'
+        content: '入驻企业：128家\n就业人数：8,500人\n年产值：15.6亿\n绿化覆盖率：42%'
       },
       {
-        title: '设备状态',
+        title: '交通态势',
         position: 'left',
         lineChart: {
-          labels: ['照明', '监控', '传感器', '其他'],
+          labels: ['早高峰', '平峰期', '晚高峰', '夜间'],
           datasets: [{
-            label: '设备数量',
-            data: [56, 32, 18, 10],
-            borderColor: '#9ccc65',
-            backgroundColor: 'rgba(156, 204, 101, 0.2)',
+            label: '平均车速(km/h)',
+            data: [35, 45, 30, 55],
+            borderColor: '#4caf50',
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
             tension: 0.3,
             fill: true
           }]
@@ -309,61 +576,6 @@ const navItems = ref([
     name: '园测数据',
     cards: [
       {
-        title: '能耗分析',
-        position: 'left',
-        gaugeChart: {
-          minValue: 0,
-          maxValue: 100,
-          currentValue: 46.3,
-          unit: '%'
-        }
-      },
-      {
-        title: '运行时长统计',
-        position: 'left',
-        content: '总运行时长：1200小时\n平均时长：12小时\n最长：照明系统'
-      },
-      {
-        title: '报警记录',
-        position: 'right',
-        lineChart: {
-          labels: ['紧急', '重要', '一般', '提示'],
-          datasets: [{
-            label: '报警次数',
-            data: [0, 1, 5, 6],
-            borderColor: '#f44336',
-            backgroundColor: 'rgba(244, 67, 54, 0.2)',
-            tension: 0.3,
-            fill: true
-          }]
-        }
-      },
-      {
-        title: '历史数据',
-        position: 'right',
-        content: '昨日能耗：1180kWh\n上周同期：1250kWh\n上月同期：32000kWh'
-      }
-    ]
-  },
-  {
-    name: '安防监控',
-    cards: [
-      {
-        title: '设备分布',
-        position: 'left',
-        lineChart: {
-          labels: ['A区', 'B区', 'C区', 'D区'],
-          datasets: [{
-            label: '设备密度',
-            data: [28, 35, 22, 21],
-            borderColor: '#9c27b0',
-            backgroundColor: 'rgba(156, 39, 176, 0.2)',
-            tension: 0.3,
-            fill: true
-          }]
-        }
-      },
-      {
         title: '风控要素',
         position: 'left',
         progressBar: [
@@ -375,29 +587,116 @@ const navItems = ref([
         ]
       },
       {
-        title: '维护计划',
+        title: '环境监测数据',
+        position: 'left',
+        environmentData: [
+          { name: '空气质量指数', value: 45, level: '优', unit: 'AQI' },
+          { name: 'PM2.5浓度', value: 25, level: '良', unit: 'μg/m³' },
+          { name: '噪声水平', value: 55, level: '良', unit: 'dB' },
+          { name: '温湿度', value: '26℃/65%', level: '舒适', unit: '' },
+          { name: '光照强度', value: 850, level: '充足', unit: 'lux' }
+        ]
+      },
+      {
+        title: '传感器状态',
         position: 'right',
-        lineChart: {
-          labels: ['待处理', '处理中', '已完成'],
+        listData: [
+          { deviceId: 'SN-001', location: '园区东门', status: '正常', time: '15:30:22' },
+          { deviceId: 'SN-002', location: '主楼大厅', status: '预警', time: '15:28:15' },
+          { deviceId: 'SN-003', location: '停车场A区', status: '正常', time: '15:25:40' },
+          { deviceId: 'SN-004', location: '园区西门', status: '故障', time: '15:22:18' },
+          { deviceId: 'SN-005', location: '绿化带区域', status: '正常', time: '15:20:33' },
+          { deviceId: 'SN-006', location: '餐厅门口', status: '正常', time: '15:18:45' }
+        ]
+      },
+      {
+        title: '雨水监测',
+        position: 'right',
+        barChart: {
+          labels: computed(() => {
+            const today = new Date()
+            const labels = []
+            // 生成最近7天的日期标签
+            for (let i = 6; i >= 0; i--) {
+              const date = new Date(today)
+              date.setDate(today.getDate() - i)
+              const month = String(date.getMonth() + 1).padStart(2, '0')
+              const day = String(date.getDate()).padStart(2, '0')
+              labels.push(`${month}-${day}`)
+            }
+            return labels
+          }),
           datasets: [{
-            label: '维护任务',
-            data: [3, 8, 15],
-            borderColor: '#00bcd4',
-            backgroundColor: 'rgba(0, 188, 212, 0.2)',
-            tension: 0.3,
-            fill: true
+            label: '降雨量(mm)',
+            data: computed(() => {
+              const today = new Date()
+              const data = [0, 0, 0, 0, 0, 0, 0]
+              // 设置特定日期的降雨数据（基于当前日期动态计算）
+              // 假设前天和昨天有降雨
+              data[2] = 3  // 前天
+              data[3] = 18  // 昨天
+              return data
+            }),
+            backgroundColor: computed(() => {
+              // 根据数据动态设置颜色深浅
+              const data = [0, 0, 0, 0, 18, 25, 0]
+              return data.map(value => 
+                value > 0 
+                  ? `rgba(33, 150, 243, ${0.6 + (value / 30) * 0.3})`  // 有雨：0.6-0.9透明度
+                  : 'rgba(33, 150, 243, 0.3)'  // 无雨：浅色
+              )
+            }),
+            borderColor: '#2196f3',
+            borderWidth: 1,
+            borderRadius: 6,
+            borderSkipped: false,
+            hoverBackgroundColor: 'rgba(33, 150, 243, 0.9)',
+            hoverBorderColor: '#ffffff',
+            hoverBorderWidth: 2
           }]
         }
+      }
+    ]
+  },
+  {
+    name: '安防监控',
+    cards: [
+      {
+        title: '监控画面',
+        position: 'right',
+        gridData: [
+          { id: 'CAM-001', location: '东门入口', status: '在线', time: computed(() => getDeviceTime('在线', false, true)) },
+          { id: 'CAM-002', location: '西门出口', status: '在线', time: computed(() => getDeviceTime('在线', false, true)) },
+          { id: 'CAM-003', location: '北区停车场', status: '离线', time: computed(() => getDeviceTime('离线', false, true)) },
+          { id: 'CAM-004', location: '南区花园', status: '在线', time: computed(() => getDeviceTime('在线', false, true)) },
+          { id: 'CAM-005', location: '中央大厅', status: '维护中', time: computed(() => getDeviceTime('维护中', false, true)) },
+          { id: 'CAM-006', location: '办公区走廊', status: '在线', time: computed(() => getDeviceTime('在线', false, true)) },
+          { id: 'CAM-007', location: '餐厅区域', status: '在线', time: computed(() => getDeviceTime('在线', false, true)) },
+          { id: 'CAM-008', location: '健身房入口', status: '在线', time: computed(() => getDeviceTime('在线', false, true)) }
+        ]
+      },
+      {
+        title: '入侵检测统计',
+        position: 'left',
+        intrusionData: [
+          { type: '人员入侵', count: 12, trend: '上升', level: 'warning' },
+          { type: '车辆闯入', count: 3, trend: '稳定', level: 'normal' },
+          { type: '周界突破', count: 1, trend: '下降', level: 'critical' },
+          { type: '异常行为', count: 8, trend: '上升', level: 'warning' },
+          { type: '非法停留', count: 5, trend: '稳定', level: 'normal' }
+        ]
       },
       {
         title: '园区监控',
-        position: 'right',
+        position: 'left',
         listData: [
-          { deviceId: 'CAM-001', location: '东门入口', status: '在线', time: '02-28 18:00' },
-          { deviceId: 'CAM-002', location: '西门出口', status: '在线', time: '02-28 18:00' },
-          { deviceId: 'CAM-003', location: '北区停车场', status: '离线', time: '02-28 17:45' },
-          { deviceId: 'CAM-004', location: '南区花园', status: '在线', time: '02-28 18:00' },
-          { deviceId: 'CAM-005', location: '中央大厅', status: '维护中', time: '02-28 17:30' }
+          { deviceId: 'CAM-001', location: '东门入口', status: '在线', time: computed(() => getDeviceTime('在线', true)) },
+          { deviceId: 'CAM-002', location: '西门出口', status: '在线', time: computed(() => getDeviceTime('在线', true)) },
+          { deviceId: 'CAM-003', location: '北区停车场', status: '离线', time: computed(() => getDeviceTime('离线', true)) },
+          { deviceId: 'CAM-004', location: '南区花园', status: '在线', time: computed(() => getDeviceTime('在线', true)) },
+          { deviceId: 'CAM-005', location: '中央大厅', status: '维护中', time: computed(() => getDeviceTime('维护中', true)) },
+          { deviceId: 'CAM-007', location: '餐厅区域', status: '在线', time: computed(() => getDeviceTime('在线', true)) },
+          { deviceId: 'CAM-008', location: '健身房入口', status: '在线', time: computed(() => getDeviceTime('在线', true)) }
         ]
       },
     ]
@@ -406,45 +705,47 @@ const navItems = ref([
     name: '能源管理',
     cards: [
       {
-        title: '性能监控',
+        title: '能耗分析',
+        position: 'left',
+        gaugeChart: {
+          minValue: 0,
+          maxValue: 100,
+          currentValue: 68.5,
+          unit: '%'
+        }
+      },
+      {
+        title: '电力负荷',
         position: 'left',
         lineChart: {
-          labels: ['CPU', '内存', '磁盘', '网络'],
+          labels: ['峰时', '平时', '谷时'],
           datasets: [{
-            label: '使用率(%)',
-            data: [45, 65, 30, 75],
-            borderColor: '#e91e63',
-            backgroundColor: 'rgba(233, 30, 99, 0.2)',
+            label: '用电负荷(kW)',
+            data: [850, 620, 380],
+            borderColor: '#ff9800',
+            backgroundColor: 'rgba(255, 152, 0, 0.2)',
             tension: 0.3,
             fill: true
           }]
         }
-      },
-      {
-        title: '用户管理',
-        position: 'left',
-        content: '在线用户：3人\n总用户数：12人\n活跃用户：8人'
-      },
-      {
-        title: '备份状态',
-        position: 'right',
-        lineChart: {
-          labels: ['成功', '失败', '进行中'],
-          datasets: [{
-            label: '备份次数',
-            data: [15, 2, 1],
-            borderColor: '#8bc34a',
-            backgroundColor: 'rgba(139, 195, 74, 0.2)',
-            tension: 0.3,
-            fill: true
-          }]
-        }
-      },
-      {
-        title: '系统信息',
-        position: 'right',
-        content: '系统版本：v2.1.0\n运行时间：15天\n最后重启：2026-01-03'
       }
+    ]
+  },
+  {
+    name: '传感器监测',
+    cards: [
+      {
+        title: '传感器监测',
+        position: 'right',
+        listData: [
+          { deviceId: 'SN-001', location: '园区东门', status: '正常', time: '15:30:22' },
+          { deviceId: 'SN-002', location: '主楼大厅', status: '预警', time: '15:28:15' },
+          { deviceId: 'SN-003', location: '停车场A区', status: '正常', time: '15:25:40' },
+          { deviceId: 'SN-004', location: '园区西门', status: '故障', time: '15:22:18' },
+          { deviceId: 'SN-005', location: '绿化带区域', status: '正常', time: '15:20:33' },
+          { deviceId: 'SN-006', location: '餐厅门口', status: '正常', time: '15:18:45' }
+        ]
+      },
     ]
   }
 ])
@@ -513,9 +814,42 @@ const chartOptions = {
       grid: { color: 'rgba(255, 255, 255, 0.1)' }
     },
     y: {
-      ticks: { color: '#e0e0e0' },
+      ticks: { 
+        color: '#e0e0e0',
+        callback: function(value) {
+          if (value >= 1000) {
+            return (value / 1000).toFixed(0) + 'k';
+          }
+          return value;
+        }
+      },
       grid: { color: 'rgba(255, 255, 255, 0.1)' },
       beginAtZero: true
+    }
+  }
+}
+
+// 为barChart专门优化的配置
+const barChartOptions = {
+  ...chartOptions,
+  scales: {
+    ...chartOptions.scales,
+    x: {
+      ...chartOptions.scales.x,
+      // 柱状图特有配置
+      barPercentage: 0.6,  // 单个柱子宽度占比
+      categoryPercentage: 0.8  // 类别组整体占比
+    }
+  },
+  plugins: {
+    ...chartOptions.plugins,
+    tooltip: {
+      ...chartOptions.plugins.tooltip,
+      callbacks: {
+        label: function(context) {
+          return context.dataset.label + ': ' + context.parsed.y + 'mm';
+        }
+      }
     }
   }
 }
@@ -532,12 +866,17 @@ const destroyAllCharts = () => {
 
 // 初始化单个图表
 const initChart = (canvasRef, cardData) => {
-  if (canvasRef && cardData?.lineChart) {
+  if (canvasRef && (cardData?.lineChart || cardData?.barChart)) {
     const ctx = canvasRef.getContext('2d')
+    const chartType = cardData.barChart ? 'bar' : 'line'
+    const chartData = cardData.barChart || cardData.lineChart
+    // 根据图表类型选择配置
+    const options = cardData.barChart ? barChartOptions : chartOptions
+    
     return new Chart(ctx, {
-      type: 'line',
-      data: cardData.lineChart,
-      options: chartOptions
+      type: chartType,
+      data: chartData,
+      options: options
     })
   }
   return null
@@ -597,6 +936,136 @@ watch(
 // onUnmounted(() => {
 //   destroyAllCharts()
 // })
+
+// 获取环境等级对应的颜色
+const getEnvironmentLevelColor = (level) => {
+  const colorMap = {
+    '优': '#4caf50',
+    '良': '#ff9800',
+    '轻度污染': '#f44336',
+    '中度污染': '#e91e63',
+    '重度污染': '#9c27b0',
+    '严重污染': '#673ab7',
+    '舒适': '#4caf50',
+    '一般': '#ff9800',
+    '较差': '#f44336',
+    '充足': '#4caf50',
+    '适中': '#ff9800',
+    '不足': '#f44336'
+  }
+  return colorMap[level] || '#9e9e9e'
+}
+
+// 实时时间相关
+const activeTab = ref(0)
+const leftCharts = ref([])
+const rightCharts = ref([])
+
+// 实时时间相关
+const currentTime = ref(new Date())
+const timeInterval = ref(null)
+
+// gaugeChart动态变化相关
+const gaugeInterval = ref(null)
+const dynamicGaugeValue = ref(68.5)
+
+// 格式化时间显示
+const formatTime = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+// 为监控设备生成时间（正常设备同步，异常设备显示固定时间或延后时间）
+const getDeviceTime = (status, includeDate = false, includeSeconds = false) => {
+  if (status === '在线') {
+    // 在线设备时间与系统时间同步
+    const timeStr = formatTime(currentTime.value)
+    if (includeDate) {
+      // 包含日期格式：MM-DD HH:MM（去掉年份，不包含秒）
+      return timeStr.substring(5, 16)
+    } else {
+      // 不包含日期格式
+      if (includeSeconds) {
+        // 显示秒：HH:MM:SS
+        return timeStr.split(' ')[1]
+      } else {
+        // 不显示秒：HH:MM
+        return timeStr.split(' ')[1].substring(0, 5)
+      }
+    }
+  } else if (status === '离线') {
+    // 离线设备显示固定时间或延后几天
+    const offlineTime = new Date(currentTime.value)
+    offlineTime.setDate(offlineTime.getDate() - 2) // 往前推2天
+    const timeStr = formatTime(offlineTime)
+    if (includeDate) {
+      // 包含日期格式：MM-DD HH:MM（去掉年份，不包含秒）
+      return timeStr.substring(5, 16)
+    } else {
+      // 不包含日期格式
+      if (includeSeconds) {
+        // 显示秒：HH:MM:SS
+        return timeStr.split(' ')[1]
+      } else {
+        // 不显示秒：HH:MM
+        return timeStr.split(' ')[1].substring(0, 5)
+      }
+    }
+  } else {
+    // 维护中或其他状态显示"N/A"
+    return 'N/A'
+  }
+}
+
+// 更新时间
+const updateTime = () => {
+  currentTime.value = new Date()
+}
+
+// 更新gaugeChart数值（1-9的小数部分随机变化）
+const updateGaugeValue = () => {
+  const integerPart = Math.floor(dynamicGaugeValue.value)
+  const randomDecimal = Math.floor(Math.random() * 9) + 1 // 1-9之间的随机数
+  dynamicGaugeValue.value = integerPart + (randomDecimal / 10)
+  
+  // 同步更新navItems中的能耗分析数据
+  const energyNav = navItems.value.find(nav => nav.name === '能源管理')
+  if (energyNav && energyNav.cards) {
+    const energyCard = energyNav.cards.find(card => card.title === '能耗分析')
+    if (energyCard && energyCard.gaugeChart) {
+      energyCard.gaugeChart.currentValue = dynamicGaugeValue.value
+    }
+  }
+}
+
+// 组件挂载时启动定时器
+onMounted(() => {
+  updateTime()
+  timeInterval.value = setInterval(updateTime, 1000)
+  // 启动gaugeChart数值更新定时器（每10秒）
+  gaugeInterval.value = setInterval(updateGaugeValue, 10000)
+})
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  if (timeInterval.value) {
+    clearInterval(timeInterval.value)
+  }
+  if (gaugeInterval.value) {
+    clearInterval(gaugeInterval.value)
+  }
+})
+
+// 获取当前时间字符串
+const getCurrentTimeString = () => {
+  return formatTime(currentTime.value)
+}
+
 </script>
 
 <style scoped>
