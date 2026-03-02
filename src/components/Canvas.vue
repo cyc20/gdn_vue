@@ -17,7 +17,7 @@ const GROUND_SIZE = 10000
 const MODEL_SCALE = 0.3 // 模型缩放
 const MODEL_POSITION = { x: 1, y: 0, z: 15 } // 模型位置
 const CAMERA_TARGET = { x: 0, y: 0, z: 0 } // 相机目标点
-const CAMERA_POSITION = { x: 6, y: 3, z: 8 } // 相机初始位置
+const CAMERA_POSITION = { x: 6, y: 8, z: 8 } // 相机初始位置
 
 // ========== 组件核心变量（场景、渲染器、控制实例）==========
 let scene, camera, renderer

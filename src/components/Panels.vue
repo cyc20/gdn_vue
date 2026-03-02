@@ -716,7 +716,7 @@ const navItems = ref([
       },
       {
         title: '电力负荷',
-        position: 'left',
+        position: 'right',
         lineChart: {
           labels: ['峰时', '平时', '谷时'],
           datasets: [{
