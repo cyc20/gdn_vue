@@ -15,10 +15,19 @@
 ></Panels>
 
 <Footer 
-  :active-nav="activeNav" 
+  :activeNav="activeNav" 
   :show-panels="showPanels"
   @nav-change="handleNavChange" 
 ></Footer>
+
+<!-- 全屏切换按钮 - 全局浮动 -->
+<button 
+  class="fullscreen-toggle"
+  @click="toggleFullscreen"
+  :title="isFullscreen ? '退出全屏' : '进入全屏'"
+>
+  {{ isFullscreen ? '❐' : '⛶' }}
+</button>
 
 <!-- 竖屏遮罩提示层 -->
 <div v-if="showPortraitOverlay" class="portrait-overlay">
@@ -46,6 +55,7 @@ const isMobilePortrait = ref(false)
 const showPortraitOverlay = ref(false) // 竖屏遮罩显示状态
 const isPageVisible = ref(true)
 const isInitializing = ref(true) // 初始化状态
+const isFullscreen = ref(false) // 全屏状态
 
 // 检测是否为移动设备
 const isMobileDevice = () => {
@@ -200,8 +210,23 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
   window.removeEventListener('forceAppReload', forcePageReload)
 })
-</script>
 
+// 全屏切换功能
+const toggleFullscreen = () => {
+  if (isFullscreen.value) {
+    document.exitFullscreen()
+  } else {
+    document.documentElement.requestFullscreen()
+  }
+}
+
+// 监听全屏状态变化
+document.addEventListener('fullscreenchange', () => {
+  isFullscreen.value = document.fullscreenElement !== null
+  console.log(`全屏状态变化: ${isFullscreen.value}`)
+})
+
+</script>
 
 
 
@@ -308,7 +333,34 @@ onUnmounted(() => {
   opacity: 0.9;
 }
 
+/* 全屏切换按钮样式 */
+.fullscreen-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
 
+.fullscreen-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fullscreen-toggle:active {
+  transform: scale(0.95);
+}
 
 @keyframes fadeIn {
   from {
