@@ -180,4 +180,15 @@ export class SceneControls {
     // 移除窗口自适应事件
     window.removeEventListener('resize', this.onWindowResize.bind(this))
   }
+
+  // 12. 设置自动旋转启用/暂停
+  setAutoRotate(enabled) {
+    this.isRotating = enabled
+    if (!enabled) {
+      clearTimeout(this.idleTimer)
+    } else {
+      this.resetIdleTimer()
+      this.startCameraTransition()
+    }
+  }
 }

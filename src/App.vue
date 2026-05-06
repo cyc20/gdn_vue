@@ -39,6 +39,15 @@
   {{ isMusicPlaying ? '⏸︎' : '▶︎' }}
 </button>
 
+<!-- 自动旋转控制按钮 -->
+<button 
+  class="autorotate-toggle"
+  @click="toggleAutoRotate"
+  :title="isAutoRotateEnabled ? '暂停自动旋转' : '开启自动旋转'"
+>
+  {{ isAutoRotateEnabled ? '🔄' : '🚫' }}
+</button>
+
 <!-- 竖屏遮罩提示层 -->
 <div v-if="showPortraitOverlay" class="portrait-overlay">
   <div class="overlay-content">
@@ -67,6 +76,7 @@ const isPageVisible = ref(true)
 const isInitializing = ref(true) // 初始化状态
 const isFullscreen = ref(false) // 全屏状态
 const isMusicPlaying = ref(false) // 音乐播放状态
+const isAutoRotateEnabled = ref(true) // 自动旋转状态（默认开启）
 let audioElement = null // 音频元素引用
 
 // 音乐控制功能
@@ -101,6 +111,17 @@ const toggleMusic = () => {
     isMusicPlaying.value = false
     console.log('音乐暂停')
   }
+}
+
+// 自动旋转控制功能
+const toggleAutoRotate = () => {
+  isAutoRotateEnabled.value = !isAutoRotateEnabled.value
+  console.log(`自动旋转状态: ${isAutoRotateEnabled.value ? '开启' : '暂停'}`)
+  
+  // 发送事件到Canvas组件
+  window.dispatchEvent(new CustomEvent('toggleAutoRotate', { 
+    detail: { enabled: isAutoRotateEnabled.value } 
+  }))
 }
 
 // 检测是否为移动设备
@@ -579,6 +600,35 @@ const detectEnvironment = () => {
 }
 
 .music-toggle:active {
+  transform: scale(0.95);
+}
+
+/* 自动旋转控制按钮样式 */
+.autorotate-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 120px; /* 距离右边120px，在音乐按钮左侧 */
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.autorotate-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.autorotate-toggle:active {
   transform: scale(0.95);
 }
 

@@ -87,7 +87,8 @@ onMounted(() => {
 }
 /* 标题 */
 .header h1 {
-  font-size: 3.6vh;
+  font-size: 3.2vh;
+  padding-top: 0.2vh;
   font-weight: bold;
   color: transparent;
   margin: 0 auto;

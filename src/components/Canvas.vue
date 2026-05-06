@@ -1,23 +1,41 @@
 <template>
-    <div id="three-container" class="fullscreen-container"></div>
+    <div id="three-container" class="fullscreen-container">
+        <!-- 加载进度条 -->
+        <div v-if="isLoading" class="loading-overlay">
+            <div class="loading-content">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" :style="{ width: progressPercent + '%' }"></div>
+                </div>
+                <span class="loading-text">{{ loadingText }}</span>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { SceneControls } from '../utils/Controls'
 
-
-// ========== 组件专属常量 ==========
+// ========== 模型配置 ==========
+const MODEL_PATH = '/models/garden.glb'
+const MODEL_SCALE = 0.3
+const MODEL_POSITION = { x: 1, y: 0, z: 15 }
+// ========== 场景配置 ==========
 const SKY_COLOR = 0xffffff
 const GROUND_COLOR = 0xffffff
 const GROUND_HEIGHT = -0.35
 const GROUND_SIZE = 10000
-const MODEL_SCALE = 0.3
-const MODEL_POSITION = { x: 1, y: 0, z: 15 }
+
+// ========== 相机配置 ==========
 const CAMERA_TARGET = { x: 0, y: 0, z: 0 }
-const CAMERA_POSITION = { x: 6, y: 8, z: 8 }
+const CAMERA_POSITION = { x: 3, y: 4, z: 8 }
+
+
+
+
+
 
 // ========== 组件核心变量 ==========
 let scene, camera, renderer
@@ -26,6 +44,11 @@ let containerEl = null
 let isInitialized = false
 let cleanupFunctions = []
 let reinitTimer = null
+
+// ========== 加载状态 ==========
+const isLoading = ref(true)
+const progressPercent = ref(0)
+const loadingText = ref('正在加载场景...')
 
 // ========== 强制重新初始化 ==========
 const forceReinitialize = () => {
@@ -143,7 +166,7 @@ const initializeScene = () => {
     // 加载模型
     const loader = new GLTFLoader()
     loader.load(
-      '/models/garden.glb',
+      MODEL_PATH,
       (gltf) => {
         try {
           const model = gltf.scene
@@ -152,13 +175,27 @@ const initializeScene = () => {
           model.rotation.y = Math.PI / 2
           scene.add(model)
           console.log('glb模型加载成功！')
+          
+          // 模型加载成功，隐藏加载进度条
+          progressPercent.value = 100
+          loadingText.value = '加载完成'
+          setTimeout(() => {
+            isLoading.value = false
+          }, 300)
         } catch (error) {
           console.error('模型添加到场景失败:', error)
+          loadingText.value = '加载失败，请刷新重试'
         }
       },
-      undefined,
+      (xhr) => {
+        // 加载进度回调
+        const percent = Math.round((xhr.loaded / xhr.total) * 100)
+        progressPercent.value = percent
+        loadingText.value = `正在加载模型... ${percent}%`
+      },
       (error) => {
         console.error('模型加载失败：', error)
+        loadingText.value = '加载失败，请刷新重试'
       }
     )
 
@@ -263,6 +300,13 @@ const handleForceReinit = () => {
   forceReinitialize()
 }
 
+const handleToggleAutoRotate = (event) => {
+  if (sceneControls) {
+    sceneControls.setAutoRotate(event.detail.enabled)
+    console.log(`Canvas收到自动旋转控制: ${event.detail.enabled ? '开启' : '暂停'}`)
+  }
+}
+
 // ========== Vue生命周期 ==========
 onMounted(() => {
   console.log('Canvas组件挂载')
@@ -275,11 +319,13 @@ onMounted(() => {
       // 添加事件监听器
       window.addEventListener('resize', handleResize, { passive: true })
       window.addEventListener('forceCanvasReinit', handleForceReinit)
+      window.addEventListener('toggleAutoRotate', handleToggleAutoRotate)
       
       // 存储清理函数
       cleanupFunctions.push(() => {
         window.removeEventListener('resize', handleResize)
         window.removeEventListener('forceCanvasReinit', handleForceReinit)
+        window.removeEventListener('toggleAutoRotate', handleToggleAutoRotate)
         
         if (window.resizeDebounceTimer) {
           clearTimeout(window.resizeDebounceTimer)
@@ -338,5 +384,66 @@ onUnmounted(() => {
   background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
   pointer-events: none;
   z-index: 1;
+}
+
+/* 加载进度条样式 */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a1628 0%, #1a365d 50%, #0d1b2a 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 60px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.progress-bar-container {
+  width: 300px;
+  height: 8px;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  transition: width 0.2s ease;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loading-text {
+  color: #e0f2fe;
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 </style>
