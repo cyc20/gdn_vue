@@ -24,7 +24,7 @@
 <button 
   class="fullscreen-toggle"
   @click="toggleFullscreen"
-  :title="isFullscreen ? '退出全屏' : '进入全屏'"
+  :title="isFullscreen ? '全屏' : '全屏'"
 >
   {{ isFullscreen ? '❐' : '⛶' }}
 </button>
@@ -33,17 +33,17 @@
 <button 
   class="music-toggle"
   @click="toggleMusic"
-  :title="isMusicPlaying ? '暂停音乐' : '播放音乐'"
+  :title="isMusicPlaying ? '音乐' : '音乐'"
   style="font-size: 16px;"
 >
-  {{ isMusicPlaying ? '⏸︎' : '▶︎' }}
+  {{ isMusicPlaying ? '⏹' : '🎵' }}
 </button>
 
 <!-- 自动旋转控制按钮 -->
 <button 
   class="autorotate-toggle"
   @click="toggleAutoRotate"
-  :title="isAutoRotateEnabled ? '暂停自动旋转' : '开启自动旋转'"
+  :title="isAutoRotateEnabled ? '自动旋转' : '自动旋转'"
 >
   {{ isAutoRotateEnabled ? '🔄' : '🚫' }}
 </button>
