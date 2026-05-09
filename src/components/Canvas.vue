@@ -19,13 +19,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { SceneControls } from '../utils/Controls'
 
 // ========== 模型配置 ==========
-const MODEL_PATH = '/models/garden.glb'
-const MODEL_SCALE = 0.3
-const MODEL_POSITION = { x: 1, y: 0, z: 15 }
+const MODEL_PATH = '/models/116.glb'
+const MODEL_SCALE = 0.2
+const MODEL_POSITION = { x: -10, y: -0.3, z: -4 }
 // ========== 场景配置 ==========
 const SKY_COLOR = 0xffffff
-const GROUND_COLOR = 0xffffff
-const GROUND_HEIGHT = -0.35
+const GROUND_COLOR = 0xB9CFA9
+const GROUND_HEIGHT = -0.5
 const GROUND_SIZE = 10000
 
 // ========== 相机配置 ==========
@@ -145,10 +145,10 @@ const initializeScene = () => {
     sceneControls = new SceneControls(camera, renderer, containerEl)
 
     // 添加光源
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
     scene.add(ambientLight)
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
     directionalLight.position.set(10, 20, 15)
     scene.add(directionalLight)
 

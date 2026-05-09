@@ -79,6 +79,12 @@ const isMusicPlaying = ref(false) // 音乐播放状态
 const isAutoRotateEnabled = ref(true) // 自动旋转状态（默认开启）
 let audioElement = null // 音频元素引用
 
+// 从localStorage恢复自动旋转状态
+const savedAutoRotate = localStorage.getItem('autoRotateEnabled')
+if (savedAutoRotate !== null) {
+  isAutoRotateEnabled.value = savedAutoRotate === 'true'
+}
+
 // 音乐控制功能
 const toggleMusic = () => {
   // 创建音频元素（如果不存在）
@@ -117,6 +123,9 @@ const toggleMusic = () => {
 const toggleAutoRotate = () => {
   isAutoRotateEnabled.value = !isAutoRotateEnabled.value
   console.log(`自动旋转状态: ${isAutoRotateEnabled.value ? '开启' : '暂停'}`)
+  
+  // 保存状态到localStorage
+  localStorage.setItem('autoRotateEnabled', String(isAutoRotateEnabled.value))
   
   // 发送事件到Canvas组件
   window.dispatchEvent(new CustomEvent('toggleAutoRotate', { 
@@ -327,6 +336,11 @@ onMounted(() => {
   setTimeout(() => {
     checkOrientation()
     isInitializing.value = false
+    
+    // 同步初始自动旋转状态到Canvas组件
+    window.dispatchEvent(new CustomEvent('toggleAutoRotate', { 
+      detail: { enabled: isAutoRotateEnabled.value } 
+    }))
   }, 1000)
   
   // 添加各种事件监听器

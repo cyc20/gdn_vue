@@ -22,9 +22,10 @@ export class SceneControls {
 
     // 视角/交互状态变量（内部维护）
     this.angle = ROTATE_INITIAL_ANGLE
-    this.isRotating = true // 默认开启旋转
-    this.isInteracting = false
-    this.isTransitioning = false
+    this.isRotating = true // 当前是否正在旋转
+    this.isInteracting = false // 是否正在交互
+    this.isTransitioning = false // 是否正在过渡
+    this.autoRotateEnabled = true // 主控制开关：自动旋转和归位是否启用
     this.idleTimer = null
     this.transitionStartTime = null
     this.startPosition = null
@@ -71,6 +72,9 @@ export class SceneControls {
 
   // 3. 重置空闲计时器（自动旋转前置逻辑）
   resetIdleTimer() {
+    // 如果主控制开关关闭，直接返回
+    if (!this.autoRotateEnabled) return
+    
     this.isRotating = false
     clearTimeout(this.idleTimer)
     this.idleTimer = setTimeout(() => {
@@ -93,6 +97,9 @@ export class SceneControls {
 
   // 6. 启动相机视角过渡动画
   startCameraTransition() {
+    // 如果主控制开关关闭，直接返回
+    if (!this.autoRotateEnabled) return
+    
     if (this.isTransitioning) return
 
     this.isTransitioning = true
@@ -139,6 +146,9 @@ export class SceneControls {
 
   // 8. 自动旋转更新（每一帧调用）
   updateAutoRotate() {
+    // 主控制开关关闭时不执行旋转
+    if (!this.autoRotateEnabled) return
+    
     if (this.isRotating && !this.isTransitioning && !this.isInteracting) {
       this.angle -= ROTATE_SPEED
       const radius = Math.sqrt(
@@ -181,13 +191,17 @@ export class SceneControls {
     window.removeEventListener('resize', this.onWindowResize.bind(this))
   }
 
-  // 12. 设置自动旋转启用/暂停
+  // 12. 设置自动旋转启用/暂停（主控制方法）
   setAutoRotate(enabled) {
-    this.isRotating = enabled
+    this.autoRotateEnabled = enabled
+    
     if (!enabled) {
+      // 关闭：停止所有旋转和归位
+      this.isRotating = false
       clearTimeout(this.idleTimer)
     } else {
-      this.resetIdleTimer()
+      // 开启：立即归位并开始旋转
+      this.isRotating = true
       this.startCameraTransition()
     }
   }
