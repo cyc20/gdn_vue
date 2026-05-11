@@ -19,9 +19,27 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { SceneControls } from '../utils/Controls'
 
 // ========== 模型配置 ==========
-const MODEL_PATH = '/models/116.glb'
-const MODEL_SCALE = 0.2
-const MODEL_POSITION = { x: -10, y: -0.3, z: -4 }
+const CURRENT_MODEL = ref('2')
+
+// 模型配置映射表
+const MODEL_CONFIGS = {
+  1: {
+    path: '/models/海边别墅.glb',
+    scale: 0.3,
+    position: { x: 1, y: 0, z: 15 }
+  },
+  2: {
+    path: '/models/116.glb',
+    scale: 0.2,
+    position: { x: -10, y: -0.3, z: -4 }
+  }
+}
+
+// 获取当前模型配置
+const getCurrentModelConfig = () => {
+  return MODEL_CONFIGS[CURRENT_MODEL.value] || MODEL_CONFIGS['2']
+}
+
 // ========== 场景配置 ==========
 const SKY_COLOR = 0xffffff
 const GROUND_COLOR = 0xB9CFA9
@@ -165,13 +183,14 @@ const initializeScene = () => {
 
     // 加载模型
     const loader = new GLTFLoader()
+    const modelConfig = getCurrentModelConfig()
     loader.load(
-      MODEL_PATH,
+      modelConfig.path,
       (gltf) => {
         try {
           const model = gltf.scene
-          model.scale.set(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE)
-          model.position.set(MODEL_POSITION.x, MODEL_POSITION.y, MODEL_POSITION.z)
+          model.scale.set(modelConfig.scale, modelConfig.scale, modelConfig.scale)
+          model.position.set(modelConfig.position.x, modelConfig.position.y, modelConfig.position.z)
           model.rotation.y = Math.PI / 2
           scene.add(model)
           console.log('glb模型加载成功！')
@@ -307,6 +326,17 @@ const handleToggleAutoRotate = (event) => {
   }
 }
 
+const handleSwitchModel = (event) => {
+  const modelId = event.detail.modelId
+  if (MODEL_CONFIGS[modelId]) {
+    CURRENT_MODEL.value = modelId
+    console.log(`Canvas收到模型切换指令: 切换到模型 ${modelId}`)
+    forceReinitialize()
+  } else {
+    console.warn(`模型 ${modelId} 不存在`)
+  }
+}
+
 // ========== Vue生命周期 ==========
 onMounted(() => {
   console.log('Canvas组件挂载')
@@ -320,12 +350,14 @@ onMounted(() => {
       window.addEventListener('resize', handleResize, { passive: true })
       window.addEventListener('forceCanvasReinit', handleForceReinit)
       window.addEventListener('toggleAutoRotate', handleToggleAutoRotate)
+      window.addEventListener('switchModel', handleSwitchModel)
       
       // 存储清理函数
       cleanupFunctions.push(() => {
         window.removeEventListener('resize', handleResize)
         window.removeEventListener('forceCanvasReinit', handleForceReinit)
         window.removeEventListener('toggleAutoRotate', handleToggleAutoRotate)
+        window.removeEventListener('switchModel', handleSwitchModel)
         
         if (window.resizeDebounceTimer) {
           clearTimeout(window.resizeDebounceTimer)

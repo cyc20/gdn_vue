@@ -48,6 +48,15 @@
   {{ isAutoRotateEnabled ? '🔄' : '🚫' }}
 </button>
 
+<!-- 模型切换按钮 -->
+<button 
+  class="model-toggle"
+  @click="toggleModel"
+  :title="currentModel === '1' ? '海边别墅' : '116号建筑'"
+>
+  {{ currentModel === '1' ? '🏠' : '🏢' }}
+</button>
+
 <!-- 竖屏遮罩提示层 -->
 <div v-if="showPortraitOverlay" class="portrait-overlay">
   <div class="overlay-content">
@@ -77,6 +86,7 @@ const isInitializing = ref(true) // 初始化状态
 const isFullscreen = ref(false) // 全屏状态
 const isMusicPlaying = ref(false) // 音乐播放状态
 const isAutoRotateEnabled = ref(true) // 自动旋转状态（默认开启）
+const currentModel = ref('2') // 当前模型ID（默认模型2）
 let audioElement = null // 音频元素引用
 
 // 从localStorage恢复自动旋转状态
@@ -130,6 +140,19 @@ const toggleAutoRotate = () => {
   // 发送事件到Canvas组件
   window.dispatchEvent(new CustomEvent('toggleAutoRotate', { 
     detail: { enabled: isAutoRotateEnabled.value } 
+  }))
+}
+
+// 模型切换功能
+const toggleModel = () => {
+  // 切换模型（1和2之间切换）
+  currentModel.value = currentModel.value === '1' ? '2' : '1'
+  const modelName = currentModel.value === '1' ? '海边别墅' : '116号建筑'
+  console.log(`模型切换: ${modelName}`)
+  
+  // 发送事件到Canvas组件
+  window.dispatchEvent(new CustomEvent('switchModel', { 
+    detail: { modelId: currentModel.value } 
   }))
 }
 
@@ -643,6 +666,35 @@ const detectEnvironment = () => {
 }
 
 .autorotate-toggle:active {
+  transform: scale(0.95);
+}
+
+/* 模型切换按钮样式 */
+.model-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 170px; /* 距离右边170px，在自动旋转按钮左侧 */
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.model-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.model-toggle:active {
   transform: scale(0.95);
 }
 
